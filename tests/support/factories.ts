@@ -23,3 +23,11 @@ export async function makePatient(caregiverId?: string, values: Partial<typeof p
   if (caregiverId) await db().insert(patientCaregivers).values({ patientId: p.id, caregiverId, role: "owner" });
   return p;
 }
+
+import { createPairingCode, pairDevice } from "@/server/services/devices";
+
+export async function makeDevice(patientId: string, caregiverId: string, kind: "patient_display" | "patient_phone" = "patient_display") {
+  const { code } = await createPairingCode(patientId, caregiverId, kind);
+  const paired = await pairDevice(code, kind === "patient_display" ? "Laptop" : "Phone");
+  return { ...paired, cookie: `wm_device=${paired.token}`, auth: { authorization: `Device ${paired.token}` } };
+}

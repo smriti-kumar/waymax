@@ -45,3 +45,9 @@ Dev: drizzle-kit 0.31.11, vitest 5.0.3, @testing-library/react 16.3.3, @testing-
 - 2026-10-03 · T2 · Login compares against a dummy bcrypt hash when the email is unknown, so timing and message are the same for both failure cases.
 - 2026-10-03 · T2 · `route()` also maps raw Postgres errors as a safety net: unique violation → 409, check/FK violation → 422, bad uuid text → 400.
 - 2026-10-03 · T2 · ESLint allows `any` in `tests/**` only.
+- 2026-10-03 · T3 · Pairing returns `201` (it creates a device). Invalid, expired and already-used codes share one calm 400 message so the patient screen never explains why.
+- 2026-10-03 · T3 · Only `patient_display` and `patient_phone` can be paired from the UI (PLAN §6); other `device_kind` values stay as future seams.
+- 2026-10-03 · T3 · Device `capabilities` default to `{camera, microphone, speaker, gps}` flags per kind at pairing time.
+- 2026-10-03 · T3 · Co-caregivers join as `member`; only an `owner` can add caregivers. Care-team management lives on the Safety page next to devices.
+- 2026-10-03 · T3 · A device is considered "online" when seen in the last 2 minutes.
+- 2026-10-03 · T3 · Patient pages (`/patient`, `/phone`) check the `wm_device` cookie server-side and redirect to `/pair` if missing/revoked, or to the other page if the device kind doesn't match.

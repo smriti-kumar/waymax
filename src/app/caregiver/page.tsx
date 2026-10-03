@@ -2,6 +2,8 @@ import Link from "next/link";
 import { currentCaregiverOrRedirect } from "@/server/auth/current";
 import { patientsForCaregiver } from "@/server/services/caregivers";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Card, CardTitle } from "@/components/ui/Card";
+import { CreatePatientForm } from "@/components/caregiver/CreatePatientForm";
 
 export const metadata = { title: "Patients · Waymax" };
 
@@ -31,6 +33,10 @@ export default async function CaregiverHome() {
           ))}
         </ul>
       )}
+      <Card>
+        <CardTitle className="mb-4">Add a patient</CardTitle>
+        <CreatePatientForm />
+      </Card>
     </main>
   );
 }
