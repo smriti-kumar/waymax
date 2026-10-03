@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { logPatientEvent } from "@/client/patient-api";
 import type { ReactNode } from "react";
 import { cx } from "@/components/ui/cx";
 
@@ -12,28 +13,38 @@ export function PatientFrame({
   buttons,
   className,
   hideConfused,
+  onConfused,
 }: {
   children: ReactNode;
   buttons?: ReactNode;
   className?: string;
   hideConfused?: boolean;
+  /** On the calming screen itself, pressing again restarts the steps instead of navigating. */
+  onConfused?: () => void;
 }) {
   return (
     <div className={cx("flex h-dvh flex-col overflow-hidden bg-cream text-[28px] text-ink", className)}>
       <div className="relative flex min-h-0 flex-1 flex-col">{children}</div>
       <nav aria-label="Actions" className="flex flex-none items-stretch gap-4 border-t-2 border-line bg-sand/70 px-6 py-4">
         <div className="flex flex-1 flex-wrap gap-4">{buttons}</div>
-        {!hideConfused && <ConfusedButton />}
+        {!hideConfused && <ConfusedButton onPress={onConfused} />}
       </nav>
     </div>
   );
 }
 
-export function ConfusedButton() {
+export function ConfusedButton({ onPress }: { onPress?: () => void }) {
   return (
     <Link
       href="/patient/calming"
       data-testid="confused-button"
+      onClick={(e) => {
+        logPatientEvent("confused_pressed");
+        if (onPress) {
+          e.preventDefault();
+          onPress();
+        }
+      }}
       className="flex min-h-[72px] flex-none items-center rounded-3xl bg-sun px-8 text-[28px] font-bold text-ink shadow-sm hover:bg-[#dc9228] active:scale-[0.98]"
     >
       I feel confused

@@ -21,7 +21,9 @@
     "tts:prewarm": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/prewarm-tts.ts",
     "verify:keys": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/verify-keys.ts",
     "verify:gemini": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/verify-gemini-models.ts",
-    "postinstall": "node scripts/copy-human-models.mjs"
+    "postinstall": "node scripts/copy-human-models.mjs && node scripts/list-calm-tracks.mjs",
+    "predev": "node scripts/list-calm-tracks.mjs",
+    "prebuild": "node scripts/list-calm-tracks.mjs"
   },
   "dependencies": {
     "@google/genai": "2.26.0",

@@ -49,3 +49,6 @@ next-env.d.ts
 
 # copied by postinstall
 /public/models/
+
+# generated at build time
+/src/generated/
