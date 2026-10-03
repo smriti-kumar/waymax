@@ -9,6 +9,7 @@ const NAV: NavItem[] = [
   { href: "/people", label: "People" },
   { href: "/approvals", label: "Approvals", badge: "pending" },
   { href: "/schedule", label: "Schedule" },
+  { href: "/questions", label: "Questions" },
   { href: "/safety", label: "Safety" },
 ];
 
