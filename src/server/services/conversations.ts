@@ -9,7 +9,9 @@ import type { Transcription } from "@/server/ai/interfaces";
 import { transcriptionSchema } from "@/server/ai/gemini";
 import { getPatient } from "./patients";
 import { NameClaimSpeakerIdentifier, type SpeakerIdentifier } from "./speaker";
+import { cardAfterConversation, recentVisit, VISIT_GAP_MS } from "./recognition";
 import { visitorNameClaims } from "@/lib/text";
+import type { PersonCardDto } from "@/lib/contracts/patient";
 
 export const MAX_CHUNK_BYTES = 4 * 1024 * 1024;
 const identifier: SpeakerIdentifier = new NameClaimSpeakerIdentifier();
@@ -133,11 +135,23 @@ export async function finishConversation(conversation: ConversationRow, now = ne
     .select({ id: people.id, name: people.name, spokenName: people.spokenName, relationship: people.relationship })
     .from(people)
     .where(and(eq(people.patientId, conversation.patientId), eq(people.status, "approved")));
-  const facePerson = conversation.personId ? (approved.find((p) => p.id === conversation.personId) ?? null) : null;
+
+  // Listen tapped with no card on screen: use whoever the camera saw during the
+  // recording or in the few minutes before it.
+  let cameraPersonId = conversation.personId;
+  let visitId = conversation.visitId;
+  if (!cameraPersonId) {
+    const seen = await recentVisit(conversation.patientId, new Date(conversation.startedAt.getTime() - VISIT_GAP_MS));
+    if (seen) {
+      cameraPersonId = seen.personId;
+      visitId = seen.visitId;
+    }
+  }
+  const facePerson = cameraPersonId ? (approved.find((p) => p.id === cameraPersonId) ?? null) : null;
 
   // §5.4 voice cross-check.
   const claim = identifier.identify({ claimedNames, facePerson, approved });
-  let personId = conversation.personId;
+  let personId = facePerson?.id ?? null;
   let mightBe: { personId: string; name: string } | null = null;
   if (claim && claim.matchesFace === null && claim.matchedPersonId) {
     const p = approved.find((x) => x.id === claim.matchedPersonId)!;
@@ -150,7 +164,7 @@ export async function finishConversation(conversation: ConversationRow, now = ne
   if (!parsed.length && failedCount > 0) {
     const [row] = await db()
       .update(conversations)
-      .set({ status: "failed", transcript: "", speakerClaim: claim, personId })
+      .set({ status: "failed", transcript: "", speakerClaim: claim, personId, visitId: personId === cameraPersonId ? visitId : null })
       .where(eq(conversations.id, conversation.id))
       .returning();
     return finishedResult(row!, mightBe);
@@ -180,14 +194,17 @@ export async function finishConversation(conversation: ConversationRow, now = ne
   }
   const [row] = await db()
     .update(conversations)
-    .set({ status: "done", transcript, summary, keyFacts, speakerClaim: claim, personId })
+    .set({ status: "done", transcript, summary, keyFacts, speakerClaim: claim, personId, visitId: personId === cameraPersonId ? visitId : null })
     .where(eq(conversations.id, conversation.id))
     .returning();
-  return finishedResult(row!, mightBe);
+  const cardVisit = personId === cameraPersonId ? visitId : null;
+  const card = personId ? await cardAfterConversation(conversation.patientId, personId, cardVisit).catch(() => null) : null;
+  return { ...finishedResult(row!, mightBe), card };
 }
 
 function finishedResult(c: ConversationRow, mightBe: { personId: string; name: string } | null) {
   return {
+    card: null as PersonCardDto | null,
     status: c.status as "done" | "failed",
     summary: c.summary,
     keyFacts: c.keyFacts,

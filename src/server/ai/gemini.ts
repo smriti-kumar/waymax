@@ -142,7 +142,7 @@ const summaryResponseSchema: Schema = {
 };
 
 export const SUMMARY_PROMPT =
-  "You help a person with memory loss remember a visit. Write a warm, simple summary in second person ('You talked with Priya about…'). Use short sentences. Do not mention illness, memory problems, or anything upsetting. Then list up to 5 concrete facts worth remembering next time.";
+  "You help a person with memory loss remember a visit. Write a warm, simple summary in second person ('You talked with <name> about…'). Use short sentences. Do not mention illness, memory problems, or anything upsetting. Then list up to 5 concrete facts worth remembering next time. Only use names that are given below or spoken in the transcript; never guess a name. If you don't know who the visitor was, call them 'your visitor'.";
 
 export class GeminiSummarizer implements Summarizer {
   constructor(private client: GeminiClient) {}

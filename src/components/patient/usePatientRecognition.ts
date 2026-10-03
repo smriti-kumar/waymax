@@ -59,6 +59,18 @@ export function usePatientRecognition(enabled: boolean) {
     }
   }, []);
 
+  /** Shows a fresher card for someone (e.g. after Listen saved a conversation with them). */
+  const updateCard = useCallback(
+    (c: PersonCardDto) => {
+      const now = Date.now();
+      lastSeen.current.set(c.personId, now);
+      lastPost.current.set(c.personId, now);
+      dismissedUntil.current.delete(c.personId);
+      showCard(c);
+    },
+    [showCard],
+  );
+
   const choose = useCallback(
     async (personId: string, confidence: number, source: "face" | "manual") => {
       const now = Date.now();
@@ -148,6 +160,7 @@ export function usePatientRecognition(enabled: boolean) {
     card,
     unknown,
     camera,
+    updateCard,
     dismissCard: () => {
       const c = cardRef.current;
       if (c) dismissedUntil.current.set(c.personId, Date.now() + CARD_LINGER_MS);

@@ -62,6 +62,9 @@ describeDb("Listen → transcription → summary → voice cross-check", () => {
     const f = await call(finish, { method: "POST", cookie: d.cookie, params: { cid } });
     expect(f.body).toMatchObject({ status: "done", speakerClaim: { claimedName: "Priya", matchesFace: true } });
     expect(f.body.summary).toMatch(/Priya/);
+    // The finish response carries a fresh card so the patient screen shows the new summary right away.
+    expect(f.body.card).toMatchObject({ personId: priya.id, visitId });
+    expect(f.body.card.recap).toContain(f.body.summary);
 
     const full = await call(getConvo, { cookie: a.cookie, params: { cid } });
     expect(full.body.transcript).toBe("A: Hi Mom, it's Priya.\nB: Hello dear.\nA: We got a puppy named Max!");
@@ -71,9 +74,22 @@ describeDb("Listen → transcription → summary → voice cross-check", () => {
 
     // The next recognition card's recap now carries the conversation.
     const next = await recordRecognition(p.id, d.deviceId, { personId: priya.id, confidence: 0.9, source: "face" }, new Date(Date.now() + 3600_000));
-    expect(next.card!.recap).toContain("Priya came to visit.");
+    expect(next.card!.recap).toContain(f.body.summary);
     // Chunk after finish → 409
     expect((await send(d.cookie, cid, 2)).status).toBe(409);
+  });
+
+  it("Listen with no card on screen is attached to whoever the camera saw recently", async () => {
+    const { a, p, d, sam } = await world();
+    setAiOverrides({ transcriber: scripted({ 10: { segments: [{ speaker: "A", text: "I ate Maggi noodles yesterday." }], selfIntroductions: [] } }) });
+    const seen = await recordRecognition(p.id, d.deviceId, { personId: sam.id, confidence: 0.9, source: "face" });
+    const cid = (await call(start, { cookie: d.cookie, body: {} })).body.conversationId;
+    await send(d.cookie, cid, 0, wavOf(1));
+    const f = await call(finish, { method: "POST", cookie: d.cookie, params: { cid } });
+    expect(f.body.card).toMatchObject({ personId: sam.id, visitId: seen.card!.visitId });
+    expect(f.body.card.recap).toContain(f.body.summary);
+    const full = await call(getConvo, { cookie: a.cookie, params: { cid } });
+    expect(full.body.conversation.personName).toBe("Sam");
   });
 
   it("a failed chunk doesn't fail the conversation", async () => {

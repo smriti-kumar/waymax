@@ -1,3 +1,4 @@
+import type { PersonCardDto } from "./patient";
 import { z } from "zod";
 import { uuid } from "./common";
 
@@ -17,4 +18,6 @@ export type FinishResponse = {
   keyFacts: string[];
   speakerClaim: SpeakerClaimDto | null;
   mightBe: { personId: string; name: string } | null;
+  /** The updated card for the person talked with, carrying this conversation's summary. */
+  card: PersonCardDto | null;
 };

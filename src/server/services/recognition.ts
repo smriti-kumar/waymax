@@ -1,8 +1,8 @@
 import "server-only";
-import { and, desc, eq, isNotNull, lt, ne } from "drizzle-orm";
+import { and, desc, eq, gte, isNotNull, lt, ne } from "drizzle-orm";
 import { formatInTimeZone } from "date-fns-tz";
 import { db } from "@/server/db/client";
-import { conversations, people, recognitionEvents, visits } from "@/server/db/schema";
+import { conversations, people, personMemories, recognitionEvents, visits } from "@/server/db/schema";
 import { notFound } from "@/server/http/errors";
 import { mediaUrl } from "@/server/storage";
 import { buildRecap, buildSayText } from "@/lib/text";
@@ -51,13 +51,23 @@ export async function personCard(patientId: string, personId: string, currentVis
     .orderBy(desc(visits.startedAt))
     .limit(1);
 
+  // Whichever is newer: the last conversation's summary (already written to the patient:
+  // "You talked with Nora about…") or the newest memory the family added for this person.
   const [convo] = await db()
-    .select({ summary: conversations.summary, keyFacts: conversations.keyFacts })
+    .select({ summary: conversations.summary, keyFacts: conversations.keyFacts, at: conversations.startedAt })
     .from(conversations)
     .where(and(eq(conversations.personId, personId), eq(conversations.status, "done"), isNotNull(conversations.summary)))
     .orderBy(desc(conversations.startedAt))
     .limit(1);
-  const lastFact = convo?.keyFacts?.[0] ?? convo?.summary ?? null;
+  const [memory] = await db()
+    .select({ title: personMemories.title, body: personMemories.body, at: personMemories.createdAt })
+    .from(personMemories)
+    .where(eq(personMemories.personId, personId))
+    .orderBy(desc(personMemories.createdAt))
+    .limit(1);
+  const convoText = convo ? convo.summary?.trim() || convo.keyFacts?.[0] || null : null;
+  const memoryText = memory ? memory.body?.trim() || `Remember: ${memory.title}` : null;
+  const lastFact = convoText && (!memory || convo!.at >= memory.at) ? convoText : (memoryText ?? convoText);
 
   const recap = buildRecap({
     name: p.name!,
@@ -82,6 +92,36 @@ export async function personCard(patientId: string, personId: string, currentVis
     sayText: buildSayText(p.name!, p.spokenName, p.relationship),
     visitId: currentVisitId,
   };
+}
+
+/**
+ * Who the camera saw most recently at or after `since` (their visit and person),
+ * used to attach a conversation to a visitor whose card wasn't on screen when
+ * Listen was tapped.
+ */
+export async function recentVisit(patientId: string, since: Date) {
+  const [v] = await db()
+    .select({ visitId: visits.id, personId: visits.personId })
+    .from(visits)
+    .where(and(eq(visits.patientId, patientId), gte(visits.lastSeenAt, since)))
+    .orderBy(desc(visits.lastSeenAt))
+    .limit(1);
+  return v ?? null;
+}
+
+/** A fresh card for someone just talked with, so the screen shows the new summary. Null if they have no visit yet. */
+export async function cardAfterConversation(patientId: string, personId: string, visitId: string | null) {
+  let id = visitId;
+  if (!id) {
+    const [v] = await db()
+      .select({ id: visits.id })
+      .from(visits)
+      .where(and(eq(visits.patientId, patientId), eq(visits.personId, personId)))
+      .orderBy(desc(visits.startedAt))
+      .limit(1);
+    id = v?.id ?? null;
+  }
+  return id ? personCard(patientId, personId, id) : null;
 }
 
 export async function recordRecognition(

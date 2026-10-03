@@ -19,6 +19,13 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
   const listen = useListen();
   const recording = listen.state === "recording" || listen.state === "starting";
 
+  // A saved conversation updates the card so it shows what was just talked about.
+  const { updateCard } = rec;
+  const savedCard = listen.result?.card ?? null;
+  useEffect(() => {
+    if (savedCard) updateCard(savedCard);
+  }, [savedCard, updateCard]);
+
   // Results fade on their own after a little while.
   useEffect(() => {
     if (!listen.result && !listen.problem) return;
