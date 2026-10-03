@@ -42,6 +42,11 @@ export class FaceMatcher {
     return this.people.reduce((n, p) => n + p.embeddings.length, 0);
   }
 
+  /** Whether two embeddings look like the same face; `slack` loosens the threshold for a single sample. */
+  sameFace(a: number[], b: number[], slack = 0.1) {
+    return this.find(a, [b]).similarity >= this.threshold - slack;
+  }
+
   /** Per-person best similarity, highest first. */
   rank(embedding: number[]): Match[] {
     return this.people

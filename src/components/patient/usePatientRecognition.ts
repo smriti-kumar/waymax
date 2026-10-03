@@ -4,6 +4,7 @@ import useSWR from "swr";
 import { fetcher } from "@/client/api";
 import { RecognitionLoop, type LoopEvent } from "@/client/face/loop";
 import { FaceMatcher } from "@/client/face/matcher";
+import { RecentFaces } from "@/client/face/recent-faces";
 import { WebcamFrameSource } from "@/client/face/frame-source";
 import { engineFromUrl, MATCH_THRESHOLD } from "@/client/face/select";
 import type { DetectedFace, FrameInput } from "@/client/face/types";
@@ -14,8 +15,12 @@ import { prefetchSpeech } from "@/client/speech/speak";
 import type { GalleryResponse, PersonCardDto } from "@/lib/contracts/patient";
 
 export const CARD_LINGER_MS = 60_000;
-/** After "Add this person", stay quiet about unknown faces for a while. */
+/** After "Add this person", stay quiet about that same face for a while (other new faces still prompt). */
 const UNKNOWN_QUIET_MS = 5 * 60_000;
+/** After "Not now", the same face waits a minute before prompting again. */
+const NOT_NOW_MS = 60_000;
+/** A card yields to a different, unknown face once its person hasn't been seen for this long. */
+const CARD_YIELD_MS = 5000;
 /** …and poll the gallery faster so an approval shows up on the next sighting. */
 const FAST_GALLERY_MS = 10 * 60_000;
 const REPOST_MS = 60_000;
@@ -28,8 +33,10 @@ export function usePatientRecognition(enabled: boolean) {
   const [unknown, setUnknown] = useState<UnknownSighting | null>(null);
   const [camera, setCamera] = useState<CameraStatus>("starting");
   const [fastGalleryUntil, setFastGalleryUntil] = useState(0);
-  const unknownQuietUntil = useRef(0);
-  const matcher = useRef(new FaceMatcher([], MATCH_THRESHOLD));
+  const [{ matcher, recentFaces }] = useState(() => {
+    const m = new FaceMatcher([], MATCH_THRESHOLD);
+    return { matcher: m, recentFaces: new RecentFaces((a, b) => m.sameFace(a, b)) };
+  });
   const engineRef = useRef<ReturnType<typeof engineFromUrl> | null>(null);
   const lastSeen = useRef(new Map<string, number>());
   const lastPost = useRef(new Map<string, number>());
@@ -78,10 +85,10 @@ export function usePatientRecognition(enabled: boolean) {
   useEffect(() => {
     if (!gallery) return;
     const people = gallery.people.map((p) => ({ ...p }));
-    matcher.current.setGallery(people);
-    matcher.current.setThreshold(gallery.threshold);
+    matcher.setGallery(people);
+    matcher.setThreshold(gallery.threshold);
     engineRef.current?.mock?.setGallery(people);
-  }, [gallery]);
+  }, [gallery, matcher]);
 
   // Camera loop.
   useEffect(() => {
@@ -90,14 +97,17 @@ export function usePatientRecognition(enabled: boolean) {
     engineRef.current = sel;
     if (gallery) sel.mock?.setGallery(gallery.people);
     const source = sel.mock ? null : new WebcamFrameSource();
-    const loop = new RecognitionLoop(sel.engine, source, matcher.current, (e: LoopEvent) => {
+    const loop = new RecognitionLoop(sel.engine, source, matcher, (e: LoopEvent) => {
       if (e.type === "recognized") {
         void choose(e.personId, e.confidence, "face");
       } else if (e.type === "unknown") {
-        const quiet = Date.now() < unknownQuietUntil.current;
-        if (!quiet && (!cardRef.current || Date.now() - (lastSeen.current.get(cardRef.current.personId) ?? 0) > 5000)) {
-          setUnknown((u) => u ?? { face: e.face, frame: e.frame, model: sel.engine.model });
-        }
+        if (recentFaces.has(e.face.embedding)) return;
+        const c = cardRef.current;
+        if (c && Date.now() - (lastSeen.current.get(c.personId) ?? 0) <= CARD_YIELD_MS) return;
+        // Someone new has replaced the person on the card: take the card down so the prompt shows.
+        if (c) showCard(null);
+        // Keep the latest sighting: the snapshot is cropped from the live frame, so box and embedding must match it.
+        setUnknown({ face: e.face, frame: e.frame, model: sel.engine.model });
       }
     });
     let cancelled = false;
@@ -106,7 +116,7 @@ export function usePatientRecognition(enabled: boolean) {
       .then(() => {
         if (cancelled) return;
         // Human exposes its native matcher only after load.
-        if (sel.engine.find) matcher.current.setFind(sel.engine.find);
+        if (sel.engine.find) matcher.setFind(sel.engine.find);
         setCamera("ok");
         reportStatus({ camera: "ok", faceModel: "ok" });
       })
@@ -123,7 +133,7 @@ export function usePatientRecognition(enabled: boolean) {
     };
     // gallery intentionally excluded: the matcher is updated in place.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, choose]);
+  }, [enabled, choose, showCard]);
 
   // Fade the card after 60 s with no sighting.
   useEffect(() => {
@@ -144,7 +154,7 @@ export function usePatientRecognition(enabled: boolean) {
       showCard(null);
     },
     dismissUnknown: () => {
-      unknownQuietUntil.current = Date.now() + 60_000;
+      if (unknown) recentFaces.add(unknown.face.embedding, NOT_NOW_MS);
       setUnknown(null);
     },
     /** Sends the face crop + embedding to the caregiver's approval queue. */
@@ -162,7 +172,7 @@ export function usePatientRecognition(enabled: boolean) {
             snapshotJpegBase64: await blobToBase64(snap),
           },
         });
-        unknownQuietUntil.current = Date.now() + UNKNOWN_QUIET_MS;
+        recentFaces.add(u.face.embedding, UNKNOWN_QUIET_MS);
         setFastGalleryUntil(Date.now() + FAST_GALLERY_MS);
         setUnknown(null);
         return true;

@@ -4,6 +4,7 @@ import { StabilityTracker } from "@/client/face/stability";
 import { checkEnrollmentFaces, enrollFromImage } from "@/client/face/enrollment";
 import { MockFaceEngine, seededVector } from "@/client/face/mock-engine";
 import { humanFind, humanSimilarity } from "@/client/face/human-match";
+import { RecentFaces } from "@/client/face/recent-faces";
 
 const near = (v: number[], eps: number, seed = 1) => {
   const n = seededVector(`noise${seed}`, v.length);
@@ -123,5 +124,26 @@ describe("enrollment rules (mock engine)", () => {
   it("checkEnrollmentFaces rejects faces with no embedding", () => {
     const r = checkEnrollmentFaces([{ embedding: [], box: { x: 0, y: 0, width: 200, height: 200 }, score: 1 }]);
     expect(r.ok).toBe(false);
+  });
+});
+
+describe("RecentFaces", () => {
+  const m = new FaceMatcher([], 0.68);
+  const same = (a: number[], b: number[]) => m.sameFace(a, b);
+
+  it("stays quiet about a face just added, but not about a different new face", () => {
+    const recent = new RecentFaces(same);
+    const first = seededVector("first-stranger");
+    recent.add(first, 60_000, 0);
+    expect(recent.has(near(first, 0.03, 4), 1000)).toBe(true);
+    expect(recent.has(seededVector("second-stranger"), 1000)).toBe(false);
+  });
+
+  it("forgets a face once its quiet time is over", () => {
+    const recent = new RecentFaces(same);
+    const face = seededVector("stranger");
+    recent.add(face, 60_000, 0);
+    expect(recent.has(face, 59_000)).toBe(true);
+    expect(recent.has(face, 61_000)).toBe(false);
   });
 });
