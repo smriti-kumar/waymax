@@ -106,12 +106,12 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
         </div>
       )}
       {listen.result && !recording && (
-        <div role="status" data-testid="listen-saved" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl border-4 border-leaf bg-leaf-wash px-8 py-6 text-[36px] font-bold text-leaf shadow-md">
+        <div role="status" data-testid="listen-saved" className="wm-slide-up absolute left-10 top-6 z-30 w-fit max-w-[calc(100%-22rem)] rounded-3xl border-4 border-leaf bg-leaf-wash px-8 py-6 text-[36px] font-bold text-leaf shadow-md">
           {listen.result.mightBe ? `This might be ${listen.result.mightBe.name}.` : "Saved. Thank you."}
         </div>
       )}
       {listen.problem && !recording && (
-        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl border-4 border-sea bg-sky px-8 py-6 text-[32px] font-bold text-sea-deep shadow-md">
+        <div role="status" className="wm-slide-up absolute left-10 top-6 z-30 w-fit max-w-[calc(100%-22rem)] rounded-3xl border-4 border-sea bg-sky px-8 py-6 text-[32px] font-bold text-sea-deep shadow-md">
           {listen.problem}
         </div>
       )}
