@@ -2,9 +2,12 @@ import { caregiverForPatientOrRedirect } from "@/server/auth/current";
 import { getPatient } from "@/server/services/patients";
 import { PatientNav } from "@/components/caregiver/PatientNav";
 
-const NAV = [
+import type { NavItem } from "@/components/caregiver/PatientNav";
+
+const NAV: NavItem[] = [
   { href: "", label: "Overview" },
   { href: "/people", label: "People" },
+  { href: "/approvals", label: "Approvals", badge: "pending" },
   { href: "/schedule", label: "Schedule" },
   { href: "/safety", label: "Safety" },
 ];

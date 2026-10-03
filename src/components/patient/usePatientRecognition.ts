@@ -8,10 +8,16 @@ import { WebcamFrameSource } from "@/client/face/frame-source";
 import { engineFromUrl, MATCH_THRESHOLD } from "@/client/face/select";
 import type { DetectedFace, FrameInput } from "@/client/face/types";
 import { postRecognition, reportStatus } from "@/client/patient-api";
+import { api } from "@/client/api";
+import { blobToBase64, cropToJpeg } from "@/client/image/resize";
 import { prefetchSpeech } from "@/client/speech/speak";
 import type { GalleryResponse, PersonCardDto } from "@/lib/contracts/patient";
 
 export const CARD_LINGER_MS = 60_000;
+/** After "Add this person", stay quiet about unknown faces for a while. */
+const UNKNOWN_QUIET_MS = 5 * 60_000;
+/** …and poll the gallery faster so an approval shows up on the next sighting. */
+const FAST_GALLERY_MS = 10 * 60_000;
 const REPOST_MS = 60_000;
 
 export type UnknownSighting = { face: DetectedFace; frame: FrameInput; model: string };
@@ -21,6 +27,8 @@ export function usePatientRecognition(enabled: boolean) {
   const [card, setCard] = useState<PersonCardDto | null>(null);
   const [unknown, setUnknown] = useState<UnknownSighting | null>(null);
   const [camera, setCamera] = useState<CameraStatus>("starting");
+  const [fastGalleryUntil, setFastGalleryUntil] = useState(0);
+  const unknownQuietUntil = useRef(0);
   const matcher = useRef(new FaceMatcher([], MATCH_THRESHOLD));
   const engineRef = useRef<ReturnType<typeof engineFromUrl> | null>(null);
   const lastSeen = useRef(new Map<string, number>());
@@ -31,7 +39,7 @@ export function usePatientRecognition(enabled: boolean) {
   const cardRef = useRef<PersonCardDto | null>(null);
 
   const { data: gallery } = useSWR<GalleryResponse>(enabled ? "/api/patient/face-gallery" : null, fetcher, {
-    refreshInterval: 60_000,
+    refreshInterval: () => (Date.now() < fastGalleryUntil ? 10_000 : 60_000),
     keepPreviousData: true,
   });
 
@@ -85,7 +93,8 @@ export function usePatientRecognition(enabled: boolean) {
       if (e.type === "recognized") {
         void choose(e.personId, e.confidence, "face");
       } else if (e.type === "unknown") {
-        if (!cardRef.current || Date.now() - (lastSeen.current.get(cardRef.current.personId) ?? 0) > 5000) {
+        const quiet = Date.now() < unknownQuietUntil.current;
+        if (!quiet && (!cardRef.current || Date.now() - (lastSeen.current.get(cardRef.current.personId) ?? 0) > 5000)) {
           setUnknown((u) => u ?? { face: e.face, frame: e.frame, model: sel.engine.model });
         }
       }
@@ -133,7 +142,34 @@ export function usePatientRecognition(enabled: boolean) {
       if (c) dismissedUntil.current.set(c.personId, Date.now() + CARD_LINGER_MS);
       showCard(null);
     },
-    dismissUnknown: () => setUnknown(null),
+    dismissUnknown: () => {
+      unknownQuietUntil.current = Date.now() + 60_000;
+      setUnknown(null);
+    },
+    /** Sends the face crop + embedding to the caregiver's approval queue. */
+    addUnknown: async () => {
+      const u = unknown;
+      if (!u) return false;
+      try {
+        const snap = await cropToJpeg(u.frame as CanvasImageSource & { width?: number; height?: number }, u.face.box);
+        await api("/api/patient/unknown-people", {
+          method: "POST",
+          json: {
+            embedding: u.face.embedding,
+            dim: u.face.embedding.length,
+            model: u.model,
+            snapshotJpegBase64: await blobToBase64(snap),
+          },
+        });
+        unknownQuietUntil.current = Date.now() + UNKNOWN_QUIET_MS;
+        setFastGalleryUntil(Date.now() + FAST_GALLERY_MS);
+        setUnknown(null);
+        return true;
+      } catch (err) {
+        console.warn("[face] add person failed", err);
+        return false;
+      }
+    },
     pickManually: (personId: string) => {
       dismissedUntil.current.delete(personId);
       return choose(personId, 1, "manual");

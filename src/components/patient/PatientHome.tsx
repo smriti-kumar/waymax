@@ -15,6 +15,8 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
   const today = useToday();
   const rec = usePatientRecognition(true);
   const [picking, setPicking] = useState(false);
+  const [thanks, setThanks] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   const buttons = rec.card ? (
     <>
@@ -31,6 +33,30 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
         Back to today
       </BigButton>
     </>
+  ) : rec.unknown ? (
+    <>
+      <BigButton
+        data-testid="add-this-person"
+        disabled={adding}
+        onClick={async () => {
+          setAdding(true);
+          const ok = await rec.addUnknown();
+          setAdding(false);
+          if (ok) {
+            setThanks(true);
+            setTimeout(() => setThanks(false), 8000);
+          }
+        }}
+      >
+        {adding ? "One moment…" : "Add this person"}
+      </BigButton>
+      <BigButton tone="light" onClick={() => setPicking(true)}>
+        Who&apos;s here?
+      </BigButton>
+      <BigButton tone="light" onClick={rec.dismissUnknown}>
+        Not now
+      </BigButton>
+    </>
   ) : (
     <>
       <BigButton tone="light" data-testid="whos-here" onClick={() => setPicking(true)}>
@@ -45,6 +71,16 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
     <PatientFrame buttons={picking ? null : buttons}>
       <TodayCard today={today} timezone={timezone} preferredName={preferredName} />
       {rec.card && <PersonCard card={rec.card} />}
+      {!rec.card && rec.unknown && (
+        <div role="status" data-testid="someone-here" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-sky px-8 py-6 text-[40px] font-bold text-sea-deep shadow-md">
+          Someone is here.
+        </div>
+      )}
+      {thanks && !rec.card && (
+        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-[#e4efdc] px-8 py-6 text-[36px] font-semibold text-leaf shadow-md">
+          Thank you. Your family will add their name.
+        </div>
+      )}
       {picking && (
         <WhoIsHerePicker
           onClose={() => setPicking(false)}
