@@ -39,3 +39,9 @@ Dev: drizzle-kit 0.31.11, vitest 5.0.3, @testing-library/react 16.3.3, @testing-
 - 2026-10-02 · T1 · Daily confusion buckets use the fixed timezone `America/New_York` (PLAN §4 note).
 - 2026-10-02 · T1 · `bytea` is a Drizzle `customType` (drizzle-orm 0.45 has no built-in bytea column).
 - 2026-10-02 · T1 · Vitest `globalSetup` drops and re-migrates `waymax_test` once per run; integration files truncate all tables in `beforeEach`. It refuses to touch a non-localhost `TEST_DATABASE_URL`.
+- 2026-10-03 · T2 · Session and device tokens are stored as HMAC-SHA256(SESSION_SECRET, token) rather than bare sha256. Same shape and column as PLAN §4, and gives `SESSION_SECRET` a real job (a leaked DB can't be turned into cookies). Changing `SESSION_SECRET` logs everyone out and un-pairs devices — so T20 keeps the generated value when copying to Vercel.
+- 2026-10-03 · T2 · Cookies are `Secure` when `NODE_ENV=production` or `NEXT_PUBLIC_APP_URL` is https; plain http on localhost otherwise so `next dev` works.
+- 2026-10-03 · T2 · `requirePatientAccess` returns 404 for a non-existent patient and 403 for an existing one the caregiver isn't linked to (matches the §6 "403, 404" columns).
+- 2026-10-03 · T2 · Login compares against a dummy bcrypt hash when the email is unknown, so timing and message are the same for both failure cases.
+- 2026-10-03 · T2 · `route()` also maps raw Postgres errors as a safety net: unique violation → 409, check/FK violation → 422, bad uuid text → 400.
+- 2026-10-03 · T2 · ESLint allows `any` in `tests/**` only.
