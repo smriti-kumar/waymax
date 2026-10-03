@@ -24,7 +24,8 @@
     "postinstall": "node scripts/copy-human-models.mjs && node scripts/list-calm-tracks.mjs",
     "predev": "node scripts/list-calm-tracks.mjs",
     "prebuild": "node scripts/list-calm-tracks.mjs",
-    "firebase:demo": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/firebase-demo.ts"
+    "firebase:demo": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/firebase-demo.ts",
+    "photon:register": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/photon-register-contacts.ts"
   },
   "dependencies": {
     "@google/genai": "2.26.0",
