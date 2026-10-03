@@ -28,6 +28,8 @@ export const deviceStatusBody = z.object({
   microphone: z.enum(["ok", "denied", "unavailable", "error"]).optional(),
   faceModel: z.enum(["ok", "loading", "error"]).optional(),
   geolocation: z.enum(["ok", "denied", "unavailable", "error"]).optional(),
+  /** IANA timezone of the patient's own device; the display keeps the patient's timezone in sync. */
+  timezone: z.string().max(60).optional(),
 });
 
 export type PersonCardDto = {
@@ -42,6 +44,8 @@ export type PersonCardDto = {
 
 export type GalleryResponse = {
   model: string;
+  /** Match threshold for this patient's display. */
+  threshold: number;
   people: { personId: string; name: string; relationship: string; photoUrl: string | null; embeddings: number[][] }[];
 };
 

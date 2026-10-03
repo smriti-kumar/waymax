@@ -31,7 +31,7 @@ describe("FaceMatcher", () => {
   ];
 
   it("picks the highest similarity above threshold", () => {
-    const m = new FaceMatcher(gallery, 0.55);
+    const m = new FaceMatcher(gallery, 0.68);
     expect(m.size).toBe(3);
     const r = m.match(near(raj, 0.03, 7));
     expect(r?.personId).toBe("p2");
@@ -46,8 +46,24 @@ describe("FaceMatcher", () => {
   });
 
   it("uses an injected find function (Human's in the browser)", () => {
-    const m = new FaceMatcher(gallery, 0.5, () => ({ index: 0, distance: 0, similarity: 0.9 }));
+    const fake = (_d: number[], ds: number[][]) => ({ index: 0, distance: 0, similarity: ds.length === 1 ? 0.9 : 0.6 });
+    const m = new FaceMatcher(gallery, 0.5, fake);
     expect(m.match(raj)).toEqual({ personId: "p1", similarity: 0.9 });
+  });
+
+  it("treats an ambiguous face (two people nearly tied) as unknown", () => {
+    const tie = (_d: number[], ds: number[][]) => ({ index: 0, distance: 0, similarity: ds.length === 1 ? 0.74 : 0.72 });
+    expect(new FaceMatcher(gallery, 0.6, tie).match(raj)).toBeNull();
+    const clear = (_d: number[], ds: number[][]) => ({ index: 0, distance: 0, similarity: ds.length === 1 ? 0.8 : 0.6 });
+    expect(new FaceMatcher(gallery, 0.6, clear).match(raj)).toEqual({ personId: "p1", similarity: 0.8 });
+  });
+
+  it("a stranger below the threshold is unknown even if one person is closest", () => {
+    const near = (_d: number[], ds: number[][]) => ({ index: 0, distance: 0, similarity: ds.length === 1 ? 0.62 : 0.3 });
+    expect(new FaceMatcher(gallery, 0.68, near).match(raj)).toBeNull();
+    const m = new FaceMatcher(gallery, 0.68, near);
+    m.setThreshold(0.6);
+    expect(m.match(raj)?.personId).toBe("p1");
   });
 });
 

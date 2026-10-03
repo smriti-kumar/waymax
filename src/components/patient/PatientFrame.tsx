@@ -24,8 +24,9 @@ export function PatientFrame({
 }) {
   return (
     <div className={cx("flex h-dvh flex-col overflow-hidden bg-cream text-[28px] text-ink", className)}>
-      <div className="relative flex min-h-0 flex-1 flex-col">{children}</div>
-      <nav aria-label="Actions" className="flex flex-none items-stretch gap-4 border-t-2 border-line bg-sand/70 px-6 py-4">
+      {/* Content is clipped and sits below the action bar, so it can never cover a button. */}
+      <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
+      <nav aria-label="Actions" className="relative z-20 flex flex-none items-stretch gap-4 border-t-2 border-line bg-sand px-6 py-4">
         <div className="flex flex-1 flex-wrap gap-4">{buttons}</div>
         {!hideConfused && <ConfusedButton onPress={onConfused} />}
       </nav>

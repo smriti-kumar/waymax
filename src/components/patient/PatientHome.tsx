@@ -10,12 +10,10 @@ import { TodayCard } from "./TodayCard";
 import { usePatientRecognition } from "./usePatientRecognition";
 import { useToday } from "./useToday";
 import { useListen } from "./useListen";
-import { WhoIsHerePicker } from "./WhoIsHerePicker";
 
 function PatientMain({ preferredName, timezone }: { preferredName: string; timezone: string }) {
   const today = useToday();
   const rec = usePatientRecognition(true);
-  const [picking, setPicking] = useState(false);
   const [thanks, setThanks] = useState(false);
   const [adding, setAdding] = useState(false);
   const listen = useListen();
@@ -55,9 +53,6 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
         Who is this?
       </BigButton>
       {listenButton}
-      <BigButton tone="light" onClick={rec.dismissCard}>
-        Back to today
-      </BigButton>
     </>
   ) : rec.unknown ? (
     <>
@@ -76,9 +71,6 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
       >
         {adding ? "One moment…" : "Add this person"}
       </BigButton>
-      <BigButton tone="light" onClick={() => setPicking(true)}>
-        Who&apos;s here?
-      </BigButton>
       <BigButton tone="light" onClick={rec.dismissUnknown}>
         Not now
       </BigButton>
@@ -86,18 +78,15 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
   ) : (
     <>
       {listenButton}
-      <BigButton tone="light" data-testid="whos-here" onClick={() => setPicking(true)}>
-        Who&apos;s here?
-      </BigButton>
       <PatientLinkButton href="/patient/questions">Questions</PatientLinkButton>
       <PatientLinkButton href="/patient/memories">Memories</PatientLinkButton>
     </>
   );
 
   return (
-    <PatientFrame buttons={picking ? null : buttons}>
+    <PatientFrame buttons={buttons}>
       <TodayCard today={today} timezone={timezone} preferredName={preferredName} />
-      {rec.card && <PersonCard card={rec.card} />}
+      {rec.card && <PersonCard card={rec.card} onClose={rec.dismissCard} />}
       {!rec.card && rec.unknown && (
         <div role="status" data-testid="someone-here" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-sky px-8 py-6 text-[40px] font-bold text-sea-deep shadow-md">
           Someone is here.
@@ -123,15 +112,6 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
         <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-[#e4efdc] px-8 py-6 text-[36px] font-semibold text-leaf shadow-md">
           Thank you. Your family will add their name.
         </div>
-      )}
-      {picking && (
-        <WhoIsHerePicker
-          onClose={() => setPicking(false)}
-          onPick={(id) => {
-            setPicking(false);
-            void rec.pickManually(id);
-          }}
-        />
       )}
     </PatientFrame>
   );

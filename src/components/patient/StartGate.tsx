@@ -1,6 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { requestMediaPermissions, unlockAudio, within } from "@/client/audio-unlock";
+import { reportStatus } from "@/client/patient-api";
 
 // Survives client-side navigation between patient screens (same document, audio
 // already unlocked); a full reload needs a fresh gesture, so it starts false again.
@@ -37,6 +38,7 @@ export function StartGate({
           } catch {
             /* full screen not available; carry on */
           }
+          reportStatus({ timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
           const perm = await requestMediaPermissions();
           onStarted?.(perm);
           startedThisDocument = true;

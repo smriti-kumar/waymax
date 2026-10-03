@@ -204,3 +204,41 @@ export async function buildToday(patientId: string, now = new Date()): Promise<T
     emptyText: items.length ? null : EMPTY_DAY_TEXT,
   };
 }
+
+function shiftYmd(ymd: string, days: number) {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return new Date(Date.UTC(y!, m! - 1, d! + days)).toISOString().slice(0, 10);
+}
+
+/** The plan for today ± `offset` days (patient display "‹ Yesterday / Tomorrow ›"). */
+export async function buildPlan(patientId: string, offset: number, now = new Date()) {
+  const patient = await getPatient(patientId);
+  const tz = patient.timezone;
+  const ymd = shiftYmd(localDate(now, tz), offset);
+  const rows = await db().select().from(scheduleItems).where(eq(scheduleItems.patientId, patientId));
+  const day = expandDay(rows, ymd, tz, now);
+  const dtos = await toDto(rows);
+  const names = new Map(dtos.map((d) => [d.id, d.personName]));
+  const noon = fromNoon(ymd, tz);
+  const label = offset === 0 ? "Today" : offset === -1 ? "Yesterday" : offset === 1 ? "Tomorrow" : dayName(noon, tz);
+  return {
+    offset,
+    dayLabel: label,
+    dateText: dateText(noon, tz),
+    items: day.map((i) => ({
+      id: i.id,
+      title: i.title,
+      kind: i.kind,
+      startsAt: i.startsAt.toISOString(),
+      endsAt: i.endsAt.toISOString(),
+      status: i.status,
+      timeText: timeText(i.startsAt, tz),
+      personName: names.get(i.id) ?? null,
+    })),
+    emptyText: day.length ? null : offset === 0 ? EMPTY_DAY_TEXT : "Nothing planned. A restful day.",
+  };
+}
+
+function fromNoon(ymd: string, tz: string) {
+  return new Date(dayBounds(ymd, tz).start.getTime() + 12 * 3600_000);
+}

@@ -42,7 +42,7 @@ export const envSchema = z.object({
 
   NEXT_PUBLIC_APP_URL: z.preprocess(blankToUndefined, z.string().default("http://localhost:3000")),
   NEXT_PUBLIC_DEMO_MODE: boolString(false),
-  NEXT_PUBLIC_FACE_MATCH_THRESHOLD: z.preprocess(blankToUndefined, z.coerce.number().min(0).max(1).default(0.55)),
+  NEXT_PUBLIC_FACE_MATCH_THRESHOLD: z.preprocess(blankToUndefined, z.coerce.number().min(0).max(1).default(0.68)),
 });
 
 export type RawEnv = z.infer<typeof envSchema>;

@@ -126,7 +126,7 @@ describeDb("notifications and Photon delivery", () => {
     setNotifyOverrides({ mode: "in_app" });
     const r = await call(testSend, { method: "POST", cookie: a.cookie, params: { pid: p.id } });
     expect(r.status).toBe(200);
-    expect(r.body.message).toMatch(/Photon not set up yet/);
+    expect(r.body.message).toMatch(/aren.t switched on yet/);
     const fake = new FakeSender();
     fake.fail = true;
     setNotifyOverrides({ mode: "photon", sender: fake });

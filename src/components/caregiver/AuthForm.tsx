@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { api, ApiClientError } from "@/client/api";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
-  const router = useRouter();
   const params = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -29,8 +28,10 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     try {
       await api(`/api/auth/${mode}`, { method: "POST", json: body });
       const next = params.get("next");
-      router.push(next && next.startsWith("/caregiver") ? next : "/caregiver");
-      router.refresh();
+      // Full page load (not a client push): a cached "signed out → /login" redirect
+      // from before sign-in can otherwise leave the user stuck on this page.
+       
+      window.location.assign(next && next.startsWith("/caregiver") ? next : "/caregiver");
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Something went wrong. Please try again.");
       setBusy(false);

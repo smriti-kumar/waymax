@@ -100,6 +100,8 @@ export const patients = pgTable("patients", {
   geofenceStateChangedAt: ts("geofence_state_changed_at"),
   outsideStreak: integer("outside_streak").notNull().default(0),
   lastLocationAt: ts("last_location_at"),
+  /** Face match strictness for this patient's display (null = app default). */
+  faceMatchThreshold: real("face_match_threshold"),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 

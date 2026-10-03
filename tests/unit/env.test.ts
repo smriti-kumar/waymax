@@ -47,7 +47,7 @@ describe("parseEnv", () => {
     expect(e.GEMINI_MODEL).toBe("gemini-3-flash-preview");
     expect(e.GEMINI_FALLBACK_MODEL).toBe("gemini-3.1-flash-lite");
     expect(e.TTS_MONTHLY_CHAR_BUDGET).toBe(18000);
-    expect(e.NEXT_PUBLIC_FACE_MATCH_THRESHOLD).toBe(0.55);
+    expect(e.NEXT_PUBLIC_FACE_MATCH_THRESHOLD).toBe(0.68);
   });
 
   it("throws a clear message when DATABASE_URL is missing", () => {
