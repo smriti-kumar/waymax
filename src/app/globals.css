@@ -64,6 +64,40 @@ body {
   line-height: 1.7;
 }
 
+/* Large, high-contrast cursors apply immediately on every route. */
+html,
+body,
+body * {
+  cursor: url("/cursors/arrow.svg") 4 4, auto;
+}
+
+a[href],
+button,
+summary,
+[role="button"],
+.cursor-pointer,
+a[href] *,
+button *,
+summary *,
+[role="button"] *,
+.cursor-pointer * {
+  cursor: url("/cursors/pointer.svg") 24 4, pointer;
+}
+
+input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+textarea,
+[contenteditable="true"],
+[contenteditable="true"] * {
+  cursor: url("/cursors/text.svg") 32 32, text;
+}
+
+:disabled,
+[aria-disabled="true"],
+:disabled *,
+[aria-disabled="true"] * {
+  cursor: url("/cursors/disabled.svg") 32 32, not-allowed;
+}
+
 /* Links read as links: always underlined unless styled as a button. */
 a:not([class]) {
   color: var(--color-sea-deep);

@@ -17,7 +17,7 @@ const PLAN_ROW = 56;
 const ROW_GAP = 12;
 
 const arrowCls =
-  "min-h-[64px] rounded-2xl border-4 border-sea bg-white px-5 text-[24px] font-bold text-sea-deep hover:bg-sky disabled:border-line disabled:text-ink-soft disabled:opacity-60";
+  "min-h-[64px] whitespace-nowrap rounded-2xl border-4 border-sea bg-white px-5 text-[24px] font-bold text-sea-deep hover:bg-sky disabled:border-line disabled:text-ink-soft disabled:opacity-60";
 
 /**
  * The idle screen. Sizes scale with the window height and each list shows only
@@ -99,12 +99,12 @@ export function TodayCard({ today, timezone, preferredName }: { today: TodayResp
           )}
         </div>
 
-        <div className="flex min-h-0 flex-col gap-3 overflow-hidden rounded-3xl border-4 border-line bg-white p-6">
-          <div className="flex flex-none flex-wrap items-center justify-between gap-3">
-            <h2 className="text-[clamp(32px,5.4vh,48px)] font-bold leading-tight" data-testid="plan-title">
+        <div className="@container flex min-h-0 flex-col gap-3 overflow-hidden rounded-3xl border-4 border-line bg-white p-6">
+          <div className="grid flex-none grid-cols-1 items-center gap-3 @[42rem]:grid-cols-[minmax(0,1fr)_auto]">
+            <h2 className="whitespace-nowrap text-[clamp(24px,3.6vh,32px)] font-bold leading-tight" data-testid="plan-title">
               {planTitle}
             </h2>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-[180px_160px] gap-2">
               <button className={arrowCls} onClick={() => setOffset((o) => Math.max(-7, o - 1))} disabled={offset <= -7} data-testid="plan-prev">
                 ‹ {offset === 1 ? "Today" : "Day before"}
               </button>
