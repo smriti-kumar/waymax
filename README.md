@@ -61,7 +61,7 @@ Optional: put 3â€“4 calm royalty-free tracks named `calm-1.mp3`, `calm-2.mp3`, â
 
 `pnpm add -g vercel`, `vercel login`, `vercel link --yes`, add every variable from `.env.example` (except `TEST_DATABASE_URL`) to Production and Preview, then `vercel --prod`. Run `pnpm db:migrate && pnpm db:seed && pnpm tts:prewarm` from the laptop against the Tiger `DATABASE_URL` (never in the Vercel build). Set `NEXT_PUBLIC_APP_URL` to the production URL and redeploy.
 
-Live URL: _added at go-live (T20)_.
+Live URL: **https://waymax-livid.vercel.app** (demo login above).
 
 ## Privacy notes
 

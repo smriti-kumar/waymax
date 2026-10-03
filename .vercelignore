@@ -1,0 +1,11 @@
+# Vercel installs and builds from source; never upload local build output or deps.
+node_modules
+.next
+.next-e2e
+test-results
+playwright-report
+public/models
+src/generated
+.env*
+!.env.example
+*.tsbuildinfo
