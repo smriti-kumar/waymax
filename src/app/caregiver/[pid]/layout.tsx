@@ -5,6 +5,7 @@ import { PatientNav } from "@/components/caregiver/PatientNav";
 const NAV = [
   { href: "", label: "Overview" },
   { href: "/people", label: "People" },
+  { href: "/schedule", label: "Schedule" },
   { href: "/safety", label: "Safety" },
 ];
 

@@ -1,12 +1,10 @@
 import { deviceOrRedirect } from "@/server/auth/device-current";
+import { PatientHome } from "@/components/patient/PatientHome";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Today · Waymax" };
 
 export default async function PatientPage() {
   const { patient } = await deviceOrRedirect("patient_display");
-  return (
-    <main className="flex flex-1 items-center justify-center bg-cream p-10">
-      <h1 className="text-[64px] font-bold">Hello, {patient.preferredName}</h1>
-    </main>
-  );
+  return <PatientHome preferredName={patient.preferredName} timezone={patient.timezone} />;
 }
