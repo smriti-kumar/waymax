@@ -3,6 +3,9 @@ import postgres from "postgres";
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { env } from "@/server/env";
 import * as schema from "./schema";
+import { isLocalUrl } from "./url";
+
+export { isLocalUrl };
 
 export type Db = PostgresJsDatabase<typeof schema>;
 
@@ -10,14 +13,6 @@ type Shared = { sql?: postgres.Sql; db?: Db; url?: string };
 const g = globalThis as unknown as { __waymaxDb?: Shared };
 const shared: Shared = (g.__waymaxDb ??= {});
 
-export function isLocalUrl(url: string) {
-  try {
-    const host = new URL(url).hostname;
-    return host === "localhost" || host === "127.0.0.1" || host === "::1";
-  } catch {
-    return false;
-  }
-}
 
 /** One shared postgres.js pool per process (survives Next dev hot reloads). */
 export function sqlClient(): postgres.Sql {

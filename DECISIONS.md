@@ -33,3 +33,9 @@ Dev: drizzle-kit 0.31.11, vitest 5.0.3, @testing-library/react 16.3.3, @testing-
 - 2026-10-02 · T0 · Only the four Human models Waymax uses (blazeface, facemesh, iris, faceres; ~6 MB) are copied to `public/models/human/`; the folder is gitignored and recreated by `postinstall`.
 - 2026-10-02 · T0 · System font stack instead of `next/font/google` so builds never need network access to Google Fonts.
 - 2026-10-02 · T0 · pnpm 11 blocks dependency build scripts by default; `pnpm-workspace.yaml#allowBuilds` allows `esbuild`, `sharp`, `unrs-resolver` (needed) and denies `protobufjs`, `@google/genai` (no-op/optional scripts).
+- 2026-10-02 · T1 · Schema lives in `src/server/db/schema.ts` (PLAN §7 layout), not `src/db/schema.ts` (§4 wording) — §7 is the authoritative repo structure.
+- 2026-10-02 · T1 · Migration files are `drizzle/0000_init.sql` and `drizzle/0001_timescale.sql`. Every Timescale statement in 0001 is wrapped in a `DO … EXCEPTION WHEN others THEN RAISE WARNING` block. Drizzle runs migrations in one transaction, so a single failing Timescale call on the free service would otherwise roll back the whole schema; this way plain tables always survive (PLAN §4 "the app must still work") and `pnpm db:migrate` prints the warnings.
+- 2026-10-02 · T1 · Locally all Timescale features applied without warnings (3 hypertables, `patient_events_daily` continuous aggregate, policy, compression).
+- 2026-10-02 · T1 · Daily confusion buckets use the fixed timezone `America/New_York` (PLAN §4 note).
+- 2026-10-02 · T1 · `bytea` is a Drizzle `customType` (drizzle-orm 0.45 has no built-in bytea column).
+- 2026-10-02 · T1 · Vitest `globalSetup` drops and re-migrates `waymax_test` once per run; integration files truncate all tables in `beforeEach`. It refuses to touch a non-localhost `TEST_DATABASE_URL`.
