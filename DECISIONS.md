@@ -9,6 +9,8 @@ Every assumption, install and deviation made during the autonomous build. Format
 - 2026-10-02 · T0 · Fallback per PLAN T0: Homebrew `postgresql@17` (17.11) + `timescale/tap/timescaledb` (2.30.2), `brew trust timescale/tap`, `timescaledb_move.sh` (it installs into `postgresql@17`), `timescaledb-tune --quiet --yes`, `brew services start postgresql@17`. The timescaledb formula also pulled `postgresql@18`, `timescaledb-tools`, `cmake`, and upgraded `openssl@3`, `readline`, `xz` as its dependencies (brew did this automatically). Brew's parallel dependency install deadlocked on an `openssl@3` lock, so deps were installed one at a time and timescaledb with `--ignore-dependencies`.
 - 2026-10-02 · T0 · Local role `waymax` / password `waymax` (superuser, local only), databases `waymax_dev` and `waymax_test`.
 - 2026-10-02 · T0 · Playwright Chromium headless shell (`pnpm exec playwright install chromium`).
+- 2026-10-03 · T8 · Local database `waymax_e2e` (Playwright's own, rebuilt each run).
+- 2026-10-03 · T20 · Vercel CLI 62.2.0 via `npm i -g vercel` (user-level under nvm; `pnpm add -g` needs a PNPM_HOME setup this machine doesn't have).
 
 ## Package versions (pinned exact)
 
@@ -139,3 +141,5 @@ Dev: drizzle-kit 0.31.11, vitest 5.0.3, @testing-library/react 16.3.3, @testing-
 - 2026-10-03 · T19 · Polling while hidden: SWR's default `refreshWhenHidden: false` covers all SWR polls; the camera loop pauses on `visibilitychange`; the pairing panel's refresh skips hidden tabs. The phone page deliberately keeps sharing (that's its job; Wake Lock keeps it visible).
 - 2026-10-03 · T19 · Added a demo-only `mockPerson=fail` mock face engine target that throws in `load()`, to E2E-test the "Human model fails to load → manual picker works" case (§11).
 - 2026-10-03 · T19 · Verified: `pnpm check` (139 tests), `pnpm test:e2e` (17 tests covering all nine §11 journeys plus failure cases), `pnpm build`, `pnpm start` → `/api/health` 200, and no secret names or values in `.next/static`.
+- 2026-10-03 · T19→T20 · Clean-clone check before handoff: fresh `git clone` + `pnpm install --frozen-lockfile` + `.env.local` → `pnpm check` (139 passed), `pnpm build` (ok), `pnpm test:e2e` (17 passed).
+- 2026-10-03 · T20 · Part A: `SETUP_NEEDED.md` written; waiting for the user's keys (the only stop in the build).
