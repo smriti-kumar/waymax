@@ -4,6 +4,7 @@ import { DevicesPanel } from "@/components/caregiver/DevicesPanel";
 import { CareTeamPanel } from "@/components/caregiver/CareTeamPanel";
 import { SafetyMapPanel } from "@/components/caregiver/SafetyMapPanel";
 import { AlertsFeed } from "@/components/caregiver/AlertsFeed";
+import { AlertContactsPanel } from "@/components/caregiver/AlertContactsPanel";
 
 export const metadata = { title: "Safety · Waymax" };
 
@@ -19,6 +20,10 @@ export default async function SafetyPage({ params }: PageProps<"/caregiver/[pid]
       <Card>
         <CardTitle className="mb-4">Alerts</CardTitle>
         <AlertsFeed pid={pid} />
+      </Card>
+      <Card>
+        <CardTitle className="mb-4">Alert contacts</CardTitle>
+        <AlertContactsPanel pid={pid} />
       </Card>
       <Card>
         <CardTitle className="mb-4">Devices</CardTitle>
