@@ -51,3 +51,8 @@ Dev: drizzle-kit 0.31.11, vitest 5.0.3, @testing-library/react 16.3.3, @testing-
 - 2026-10-03 · T3 · Co-caregivers join as `member`; only an `owner` can add caregivers. Care-team management lives on the Safety page next to devices.
 - 2026-10-03 · T3 · A device is considered "online" when seen in the last 2 minutes.
 - 2026-10-03 · T3 · Patient pages (`/patient`, `/phone`) check the `wm_device` cookie server-side and redirect to `/pair` if missing/revoked, or to the other page if the device kind doesn't match.
+- 2026-10-03 · T4 · Added `GET /api/people/:personId` → `{person, photos, memories}` for the person page (not in §6, needed by the UI). A person's "photos" are the union of their primary photo, enrollment photos (media referenced by `face_embeddings`) and memory photos — `media_blobs` has no `person_id`, so this avoids a schema change.
+- 2026-10-03 · T4 · The first uploaded photo becomes the person's primary photo automatically; `setPrimary=true` overrides.
+- 2026-10-03 · T4 · The upload route sniffs magic bytes (JPEG/PNG/WebP) instead of trusting the declared mime; `media_blobs` are de-duplicated per patient by sha256.
+- 2026-10-03 · T4 · Client resize: longest side 1024 px, JPEG quality steps 0.86→0.56, then shrinks 20% per round until ≤300 KB.
+- 2026-10-03 · T4 · A memory with a photo is saved with kind `photo`.
