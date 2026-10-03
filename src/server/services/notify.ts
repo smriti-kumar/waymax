@@ -27,3 +27,14 @@ export async function createInAppNotification(input: {
     .returning();
   return row ?? null;
 }
+
+/** Geofence alert: in-app row first, then Photon delivery (wired in T11). */
+export async function sendGeofenceAlert(input: {
+  patientId: string;
+  kind: "geofence_exit" | "geofence_return";
+  title: string;
+  body: string;
+  dedupeKey: string;
+}) {
+  return createInAppNotification({ ...input, photonStatus: "skipped" });
+}

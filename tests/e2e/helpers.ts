@@ -47,3 +47,27 @@ export async function pairDisplay(browser: Browser, code: string, query = "") {
 }
 
 export const spoken = (page: Page) => page.evaluate(() => window.__waymaxSpoken ?? []);
+
+export const HOME = { latitude: 42.444, longitude: -76.5019 };
+
+export async function setHome(ctx: BrowserContext, pid: string, radiusM = 150) {
+  const r = await ctx.request.put(`/api/patients/${pid}/geofences/home`, {
+    data: { lat: HOME.latitude, lng: HOME.longitude, radiusM, label: "Home" },
+  });
+  expect(r.status()).toBe(200);
+}
+
+/** Pairs a phone-sized context with geolocation permission at `at`. */
+export async function pairPhone(browser: Browser, code: string, at = HOME) {
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    permissions: ["geolocation"],
+    geolocation: { ...at, accuracy: 10 },
+  });
+  const page = await ctx.newPage();
+  await page.goto("/pair");
+  await page.getByLabel("Type the 6-digit code").fill(code);
+  await page.getByRole("button", { name: "Connect" }).click();
+  await page.waitForURL("**/phone");
+  return { ctx, page };
+}

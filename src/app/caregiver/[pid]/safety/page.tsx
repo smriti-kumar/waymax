@@ -2,6 +2,8 @@ import { caregiverForPatientOrRedirect } from "@/server/auth/current";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { DevicesPanel } from "@/components/caregiver/DevicesPanel";
 import { CareTeamPanel } from "@/components/caregiver/CareTeamPanel";
+import { SafetyMapPanel } from "@/components/caregiver/SafetyMapPanel";
+import { AlertsFeed } from "@/components/caregiver/AlertsFeed";
 
 export const metadata = { title: "Safety · Waymax" };
 
@@ -10,6 +12,14 @@ export default async function SafetyPage({ params }: PageProps<"/caregiver/[pid]
   const { role } = await caregiverForPatientOrRedirect(pid);
   return (
     <>
+      <Card>
+        <CardTitle className="mb-4">Location and safe area</CardTitle>
+        <SafetyMapPanel pid={pid} />
+      </Card>
+      <Card>
+        <CardTitle className="mb-4">Alerts</CardTitle>
+        <AlertsFeed pid={pid} />
+      </Card>
       <Card>
         <CardTitle className="mb-4">Devices</CardTitle>
         <DevicesPanel pid={pid} />
