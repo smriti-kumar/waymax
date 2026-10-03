@@ -23,7 +23,7 @@ export function CreatePatientForm({ onDone }: { onDone?: (id: string) => void })
         json: { name: f.get("name"), preferredName: f.get("preferredName"), timezone: f.get("timezone") },
       });
       if (onDone) onDone(patient.id);
-      else router.push(`/caregiver/${patient.id}`);
+      else router.push(`/caregiver/${patient.id}/setup`);
     } catch (err) {
       setError(err instanceof ApiClientError ? err.message : "Couldn't add the patient. Try again.");
       setBusy(false);

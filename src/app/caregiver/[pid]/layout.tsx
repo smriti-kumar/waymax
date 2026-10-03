@@ -14,6 +14,7 @@ const NAV: NavItem[] = [
   { href: "/conversations", label: "Conversations" },
   { href: "/questions", label: "Questions" },
   { href: "/safety", label: "Safety" },
+  { href: "/setup", label: "Setup" },
 ];
 
 export default async function PatientLayout({ children, params }: LayoutProps<"/caregiver/[pid]">) {
