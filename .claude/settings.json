@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm:*)", "Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)", "Bash(corepack:*)",
+      "Bash(brew:*)", "Bash(docker:*)", "Bash(psql:*)", "Bash(createdb:*)", "Bash(pg_ctl:*)",
+      "Bash(timescaledb-tune:*)", "Bash(vercel:*)", "Bash(openssl:*)", "Bash(curl:*)",
+      "Bash(git:*)", "Bash(mkdir:*)", "Bash(cp:*)", "Bash(mv:*)", "Bash(ls:*)", "Bash(cat:*)",
+      "Bash(chmod:*)", "Bash(lsof:*)",
+      "Edit", "Write", "Read", "WebFetch", "WebSearch"
+    ],
+    "deny": ["Bash(sudo:*)", "Bash(rm -rf /*)", "Bash(rm -rf ~*)"]
+  }
+}
