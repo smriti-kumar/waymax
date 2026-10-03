@@ -1,13 +1,15 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BrowserGeolocation, PingThrottle, type Fix, type LocationError } from "@/client/location/source";
 import { haversineM } from "@/lib/geo";
-import { api } from "@/client/api";
+import { api, ApiClientError } from "@/client/api";
 import { reportStatus } from "@/client/patient-api";
 
 type Status = "starting" | "sharing" | LocationError;
 
 export function PhoneSharing({ preferredName, caregiverName }: { preferredName: string; caregiverName: string }) {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("starting");
   const [lastSent, setLastSent] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -28,8 +30,9 @@ export function PhoneSharing({ preferredName, caregiverName }: { preferredName: 
           });
           throttle.current.sent(f);
           setLastSent(Date.now());
-        } catch {
-          /* offline: the next fix retries */
+        } catch (err) {
+          if (err instanceof ApiClientError && err.status === 401) router.replace("/pair");
+          /* otherwise offline: the next fix retries */
         } finally {
           sending = false;
         }
@@ -44,7 +47,7 @@ export function PhoneSharing({ preferredName, caregiverName }: { preferredName: 
       src.stop();
       clearInterval(t);
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (status === "sharing") reportStatus({ geolocation: "ok" });

@@ -21,12 +21,13 @@ export function seededVector(seed: string, dim = MOCK_DIM): number[] {
   return Array.from({ length: dim }, () => rand() - 0.5);
 }
 
-export type MockTarget = string | "unknown" | "none";
+export type MockTarget = string | "unknown" | "none" | "fail";
 
 /**
  * Test/demo engine (?faceEngine=mock&mockPerson=<id|unknown|none>, demo mode only).
  * A person id returns that person's first gallery embedding; "unknown" returns a
- * fixed vector that matches nobody until it is approved; "none" returns no faces.
+ * fixed vector that matches nobody until it is approved; "none" returns no faces;
+ * "fail" throws from load() like a model that can't be downloaded.
  */
 export class MockFaceEngine implements FaceEngine {
   readonly model = MOCK_MODEL;
@@ -45,7 +46,10 @@ export class MockFaceEngine implements FaceEngine {
     this.target = t;
   }
 
-  async load() {}
+  async load() {
+    // "fail" simulates the face model not loading (PLAN §11 failure case).
+    if (this.target === "fail") throw new Error("mock: face model failed to load");
+  }
 
   async detect(frame: FrameInput): Promise<DetectedFace[]> {
     const count = this.opts.faces ?? (this.target === "none" ? 0 : 1);

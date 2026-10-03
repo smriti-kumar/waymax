@@ -67,7 +67,7 @@ export function QuestionsScreen() {
         {!data && !error ? (
           <p>One moment…</p>
         ) : qs.length === 0 ? (
-          <p className="text-[36px]">Your family hasn&apos;t added any questions yet.</p>
+          <p className="text-[36px]">{error ? "The questions aren't ready just now. Let's look again in a little while." : "Your family hasn't added any questions yet."}</p>
         ) : (
           <div className="flex flex-col gap-5">
             {shown.map((q) => (

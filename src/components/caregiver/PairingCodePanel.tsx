@@ -19,7 +19,9 @@ export function PairingCodePanel({ pid, onPaired }: { pid: string; onPaired?: ()
 
   useEffect(() => {
     if (!onPaired || !Object.keys(codes).length) return;
-    const t = setInterval(onPaired, 5000);
+    const t = setInterval(() => {
+      if (!document.hidden) onPaired();
+    }, 5000);
     return () => clearInterval(t);
   }, [codes, onPaired]);
 

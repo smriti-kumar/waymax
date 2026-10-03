@@ -21,7 +21,7 @@ const backLink = "flex min-h-[72px] items-center rounded-3xl border-4 border-sea
 
 /** Full-screen photo + caption, narrated; advances every 8 s (after the caption has been spoken). */
 export function Slideshow({ personId, slideMs = 8000 }: { personId: string; slideMs?: number }) {
-  const { data } = useSWR<Show>(`/api/patient/people/${personId}/memories`, fetcher);
+  const { data, error } = useSWR<Show>(`/api/patient/people/${personId}/memories`, fetcher, { shouldRetryOnError: true, errorRetryInterval: 10_000 });
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -104,7 +104,7 @@ export function Slideshow({ personId, slideMs = 8000 }: { personId: string; slid
       }
     >
       {!data || !slide ? (
-        <p className="m-auto">One moment…</p>
+        <p className="m-auto text-[36px]">{error ? "These photos aren't ready just now. Let's look again in a little while." : "One moment…"}</p>
       ) : (
         <section className="relative flex h-full flex-col items-center justify-center gap-6 bg-ink px-10 py-6" data-testid="slideshow" data-slide={i}>
           {slide.photoUrl ? (
