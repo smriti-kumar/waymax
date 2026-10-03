@@ -300,7 +300,11 @@ export const visits = pgTable(
   (t) => [index().on(t.patientId, t.startedAt.desc()), index().on(t.personId, t.startedAt.desc())],
 );
 
-export type SpeakerClaim = { claimedName: string; matchesFace: boolean; matchedPersonId?: string | null };
+/**
+ * Voice cross-check result. `matchesFace` is null when no face was recognized to
+ * compare against; `matchedPersonId` is the approved person the claimed name matched.
+ */
+export type SpeakerClaim = { claimedName: string; matchesFace: boolean | null; matchedPersonId?: string | null; faceName?: string | null };
 
 export const conversations = pgTable(
   "conversations",

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { logPatientEvent } from "@/client/patient-api";
 import { speak } from "@/client/speech/speak";
 import { BigButton } from "@/components/ui/BigButton";
@@ -9,6 +9,7 @@ import { StartGate } from "./StartGate";
 import { TodayCard } from "./TodayCard";
 import { usePatientRecognition } from "./usePatientRecognition";
 import { useToday } from "./useToday";
+import { useListen } from "./useListen";
 import { WhoIsHerePicker } from "./WhoIsHerePicker";
 
 function PatientMain({ preferredName, timezone }: { preferredName: string; timezone: string }) {
@@ -17,8 +18,32 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
   const [picking, setPicking] = useState(false);
   const [thanks, setThanks] = useState(false);
   const [adding, setAdding] = useState(false);
+  const listen = useListen();
+  const recording = listen.state === "recording" || listen.state === "starting";
 
-  const buttons = rec.card ? (
+  // Results fade on their own after a little while.
+  useEffect(() => {
+    if (!listen.result && !listen.problem) return;
+    const t = setTimeout(listen.clear, 10_000);
+    return () => clearTimeout(t);
+  }, [listen.result, listen.problem, listen.clear]);
+
+  const listenButton = (
+    <BigButton
+      tone="leaf"
+      data-testid="listen"
+      disabled={listen.state !== "idle"}
+      onClick={() => listen.start({ visitId: rec.card?.visitId ?? null, personId: rec.card?.personId ?? null })}
+    >
+      {listen.state === "saving" ? "Saving…" : "Listen"}
+    </BigButton>
+  );
+
+  const buttons = recording ? (
+    <BigButton tone="sea" data-testid="listen-stop" onClick={() => void listen.stop()} className="min-w-[260px]">
+      Stop
+    </BigButton>
+  ) : rec.card ? (
     <>
       <BigButton
         data-testid="who-is-this"
@@ -29,6 +54,7 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
       >
         Who is this?
       </BigButton>
+      {listenButton}
       <BigButton tone="light" onClick={rec.dismissCard}>
         Back to today
       </BigButton>
@@ -59,6 +85,7 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
     </>
   ) : (
     <>
+      {listenButton}
       <BigButton tone="light" data-testid="whos-here" onClick={() => setPicking(true)}>
         Who&apos;s here?
       </BigButton>
@@ -74,6 +101,22 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
       {!rec.card && rec.unknown && (
         <div role="status" data-testid="someone-here" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-sky px-8 py-6 text-[40px] font-bold text-sea-deep shadow-md">
           Someone is here.
+        </div>
+      )}
+      {recording && (
+        <div role="status" data-testid="recording" className="absolute right-10 top-6 z-30 flex items-center gap-4 rounded-full bg-white px-8 py-4 text-[36px] font-bold shadow-md">
+          <span className="wm-pulse h-6 w-6 rounded-full bg-sun-deep" aria-hidden />
+          {listen.state === "starting" ? "Starting…" : "Recording"}
+        </div>
+      )}
+      {listen.result && !recording && (
+        <div role="status" data-testid="listen-saved" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl bg-[#e4efdc] px-8 py-6 text-[36px] font-semibold text-leaf shadow-md">
+          {listen.result.mightBe ? `This might be ${listen.result.mightBe.name}.` : "Saved. Thank you."}
+        </div>
+      )}
+      {listen.problem && !recording && (
+        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl bg-sky px-8 py-6 text-[32px] font-semibold text-sea-deep shadow-md">
+          {listen.problem}
         </div>
       )}
       {thanks && !rec.card && (
