@@ -67,3 +67,25 @@ export function buildSayText(name: string, spokenName: string | null, relationsh
   const n = spokenName?.trim() || name;
   return relationship ? `This is ${n}, your ${relationship}.` : `This is ${n}.`;
 }
+
+/** Words a visitor calls the patient ("Hi Mom"), which are never the visitor's own name. */
+const KINSHIP = new Set([
+  "mom", "mum", "mother", "mama", "ma", "mommy", "mummy", "dad", "father", "papa", "pa", "daddy",
+  "grandma", "grandmother", "granny", "nana", "nan", "gran", "grandpa", "grandfather", "grandad", "granddad", "pop", "pops",
+  "auntie", "aunt", "uncle", "dear", "darling", "honey", "sweetheart", "love", "sir", "madam", "maam", "ma'am",
+]);
+
+/**
+ * Keeps only plausible visitor names from Gemini's self-introductions: drops
+ * kinship/endearment words and the patient's own names.
+ */
+export function visitorNameClaims(names: string[], patientNames: (string | null | undefined)[]) {
+  const own = patientNames.filter(Boolean).flatMap((n) => n!.toLowerCase().split(/\s+/));
+  return names.filter((raw) => {
+    const n = raw.trim().toLowerCase().replace(/[^a-z' -]/g, "");
+    if (!n) return false;
+    if (KINSHIP.has(n)) return false;
+    if (own.includes(n) || namesMatch(n, patientNames, 1)) return false;
+    return true;
+  });
+}

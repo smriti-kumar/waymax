@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildRecap, buildSayText, levenshtein, namesMatch } from "@/lib/text";
+import { buildRecap, buildSayText, levenshtein, namesMatch, visitorNameClaims } from "@/lib/text";
 
 describe("levenshtein / namesMatch", () => {
   it("computes edit distance", () => {
@@ -32,5 +32,13 @@ describe("buildRecap", () => {
   it("builds the spoken line with the pronunciation hint", () => {
     expect(buildSayText("Priya", "PREE-yah", "daughter")).toBe("This is PREE-yah, your daughter.");
     expect(buildSayText("Raj", null, null)).toBe("This is Raj.");
+  });
+});
+
+describe("visitorNameClaims", () => {
+  it("drops what visitors call the patient (live Gemini returned 'mom' as a name)", () => {
+    expect(visitorNameClaims(["Priya", "mom"], ["Margaret Lee", "Maggie"])).toEqual(["Priya"]);
+    expect(visitorNameClaims(["Grandma", "Maggie", "Margaret", "Sam"], ["Margaret Lee", "Maggie"])).toEqual(["Sam"]);
+    expect(visitorNameClaims(["  "], ["Maggie"])).toEqual([]);
   });
 });

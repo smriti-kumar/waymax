@@ -137,3 +137,19 @@ describeDb("Listen → transcription → summary → voice cross-check", () => {
     expect((await send(od.cookie, cid, 0)).status).toBe(404);
   });
 });
+
+describeDb("voice cross-check ignores what visitors call the patient", () => {
+  beforeEach(truncateAll);
+  afterEach(clearAiOverrides);
+  it("'Hi Mom' alone raises no mismatch flag", async () => {
+    const { p, d, priya } = await world();
+    setAiOverrides({
+      transcriber: scripted({ 10: { segments: [{ speaker: "A", text: "Hi Mom, how are you?" }], selfIntroductions: [{ name: "mom", quote: "Hi Mom" }] } }),
+    });
+    const { visitId } = (await recordRecognition(p.id, d.deviceId, { personId: priya.id, confidence: 0.9, source: "face" })).card!;
+    const cid = (await call(start, { cookie: d.cookie, body: { visitId } })).body.conversationId;
+    await send(d.cookie, cid, 0, wavOf(1));
+    const f = await call(finish, { method: "POST", cookie: d.cookie, params: { cid } });
+    expect(f.body.speakerClaim).toBeNull();
+  });
+});

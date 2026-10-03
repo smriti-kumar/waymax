@@ -9,6 +9,7 @@ import type { Transcription } from "@/server/ai/interfaces";
 import { transcriptionSchema } from "@/server/ai/gemini";
 import { getPatient } from "./patients";
 import { NameClaimSpeakerIdentifier, type SpeakerIdentifier } from "./speaker";
+import { visitorNameClaims } from "@/lib/text";
 
 export const MAX_CHUNK_BYTES = 4 * 1024 * 1024;
 const identifier: SpeakerIdentifier = new NameClaimSpeakerIdentifier();
@@ -123,9 +124,11 @@ export async function finishConversation(conversation: ConversationRow, now = ne
   const parsed = chunks.filter((c) => c.status === "done").map((c) => parseChunk(c.transcript)).filter((t): t is Transcription => !!t);
   const failedCount = chunks.filter((c) => c.status !== "done").length;
   const transcript = parsed.map(readableTranscript).filter(Boolean).join("\n");
-  const claimedNames = parsed.flatMap((t) => t.selfIntroductions.map((s) => s.name));
-
   const patient = await getPatient(conversation.patientId);
+  const claimedNames = visitorNameClaims(
+    parsed.flatMap((t) => t.selfIntroductions.map((s) => s.name)),
+    [patient.name, patient.preferredName],
+  );
   const approved = await db()
     .select({ id: people.id, name: people.name, spokenName: people.spokenName, relationship: people.relationship })
     .from(people)
