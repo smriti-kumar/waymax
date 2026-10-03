@@ -43,6 +43,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@mswjs/interceptors": "0.45.6",
     "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "10.4.2",

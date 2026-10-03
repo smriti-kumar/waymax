@@ -1,17 +1,21 @@
 "use client";
+import { useState } from "react";
+import { speak } from "@/client/speech/speak";
 import { Button } from "@/components/ui/Button";
 
-/** Speaks "{name}, your {relationship}." — wired to the TTS pipeline in T7. */
+/** Speaks "{name}, your {relationship}." through the same TTS pipeline as the patient laptop. */
 export function PreviewVoiceButton({ name, relationship }: { name: string; relationship: string }) {
+  const [busy, setBusy] = useState(false);
   return (
     <Button
       type="button"
       variant="ghost"
+      loading={busy}
       disabled={!name || !relationship}
-      onClick={() => {
-        const u = new SpeechSynthesisUtterance(`${name}, your ${relationship}.`);
-        u.rate = 0.85;
-        window.speechSynthesis?.speak(u);
+      onClick={async () => {
+        setBusy(true);
+        await speak(`${name}, your ${relationship}.`);
+        setBusy(false);
       }}
     >
       Preview voice
