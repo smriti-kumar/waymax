@@ -81,6 +81,7 @@ export type PersonDetail = {
   person: PersonSummary;
   photos: { mediaId: string; url: string; hasEmbedding: boolean; isPrimary: boolean }[];
   memories: MemoryDto[];
+  dates: { id: string; kind: "birthday" | "anniversary" | "other"; label: string | null; month: number; day: number; year: number | null }[];
 };
 
 export const REQUIRED_SAMPLES = 3;

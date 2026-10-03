@@ -10,11 +10,11 @@ async function makePatient() {
 describeDb("database schema", () => {
   beforeEach(truncateAll);
 
-  it("creates all 22 tables", async () => {
+  it("creates all 23 tables (22 from PLAN §4 + person_dates)", async () => {
     const rows = await sqlClient()`
       select count(*)::int as n from information_schema.tables
       where table_schema = 'public' and table_type = 'BASE TABLE'`;
-    expect(rows[0].n).toBe(22);
+    expect(rows[0].n).toBe(23);
   });
 
   it("makes the three time-series tables hypertables", async () => {

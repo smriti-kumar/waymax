@@ -9,6 +9,7 @@ import { EmptyState, ErrorState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Spinner";
 import { Avatar } from "./Avatar";
 import { PersonForm } from "./PersonForm";
+import { StrictnessSetting } from "./StrictnessSetting";
 
 export function SamplesBadge({ n }: { n: number }) {
   if (n >= REQUIRED_SAMPLES)
@@ -59,6 +60,10 @@ export function PeopleList({ pid }: { pid: string }) {
             ))}
           </ul>
         )}
+      </Card>
+      <Card>
+        <CardTitle className="mb-3">Face recognition</CardTitle>
+        <StrictnessSetting pid={pid} />
       </Card>
       <Card>
         <CardTitle className="mb-4">Add a person</CardTitle>

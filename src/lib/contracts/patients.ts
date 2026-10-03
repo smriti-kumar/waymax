@@ -13,6 +13,7 @@ export const patchPatientBody = z
     preferredName: nonEmpty(60),
     timezone,
     homeLabel: nonEmpty(60),
+    faceMatchThreshold: z.number().min(0.4).max(0.95).nullable(),
   })
   .partial()
   .refine((v) => Object.keys(v).length > 0, "Nothing to update");

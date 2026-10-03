@@ -18,10 +18,10 @@ export type NotificationDto = {
 };
 
 const DELIVERY: Record<NotificationDto["photonStatus"], string> = {
-  sent: "iMessage sent",
-  pending: "iMessage sending…",
-  failed: "iMessage failed",
-  skipped: "in-app only",
+  sent: "text sent ✓",
+  pending: "sending text…",
+  failed: "text didn't go through",
+  skipped: "shown here only",
 };
 
 export function AlertsFeed({ pid, limit = 10 }: { pid: string; limit?: number }) {

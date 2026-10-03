@@ -59,3 +59,6 @@ export function formatDistance(m: number) {
 
 export const osmLink = (p: LatLng) =>
   `https://www.openstreetmap.org/?mlat=${p.lat.toFixed(5)}&mlon=${p.lng.toFixed(5)}#map=17/${p.lat.toFixed(5)}/${p.lng.toFixed(5)}`;
+
+/** Map link for alert texts (no API key needed; opens Google Maps on phones). */
+export const mapsLink = (p: LatLng) => `https://www.google.com/maps/search/?api=1&query=${p.lat.toFixed(5)},${p.lng.toFixed(5)}`;

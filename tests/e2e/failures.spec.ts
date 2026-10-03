@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { caregiverContext, createPatient, createPerson, pairDisplay, pairingCode } from "./helpers";
 
-test("face model fails to load → caregiver sees a gentle flag, patient's manual picker still works", async ({ browser }) => {
+test("face model fails to load → caregiver sees a gentle flag, the patient screen still works", async ({ browser }) => {
   const { ctx } = await caregiverContext(browser);
   const pid = await createPatient(ctx);
   await createPerson(ctx, pid, "Raj", "son", 0);
@@ -9,9 +9,8 @@ test("face model fails to load → caregiver sees a gentle flag, patient's manua
 
   // Nothing alarming on the patient side.
   await expect(page.getByText(/fail|error/i)).toHaveCount(0);
-  await page.getByTestId("whos-here").click();
-  await page.getByRole("button", { name: /Raj/ }).click();
-  await expect(page.getByTestId("person-card-name")).toHaveText("Raj");
+  await page.getByRole("link", { name: "Questions" }).click();
+  await expect(page.getByRole("heading", { name: "Questions" })).toBeVisible();
 
   const cg = await ctx.newPage();
   await cg.goto(`/caregiver/${pid}`);

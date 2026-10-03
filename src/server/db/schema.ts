@@ -72,6 +72,8 @@ export const caregivers = pgTable("caregivers", {
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
   phoneE164: text("phone_e164"),
+  /** Firebase Authentication uid when the caregiver signs in with Firebase. */
+  firebaseUid: text("firebase_uid").unique(),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
@@ -100,6 +102,8 @@ export const patients = pgTable("patients", {
   geofenceStateChangedAt: ts("geofence_state_changed_at"),
   outsideStreak: integer("outside_streak").notNull().default(0),
   lastLocationAt: ts("last_location_at"),
+  /** Face match strictness for this patient's display (null = app default). */
+  faceMatchThreshold: real("face_match_threshold"),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
@@ -281,6 +285,31 @@ export const personMemories = pgTable(
     createdAt: ts("created_at").notNull().defaultNow(),
   },
   (t) => [index().on(t.personId)],
+);
+
+export const dateKind = pgEnum("date_kind", ["birthday", "anniversary", "other"]);
+
+/** Birthdays, anniversaries and other yearly dates for a person (month/day; year optional). */
+export const personDates = pgTable(
+  "person_dates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id, { onDelete: "cascade" }),
+    kind: dateKind("kind").notNull(),
+    label: text("label"),
+    month: smallint("month").notNull(),
+    day: smallint("day").notNull(),
+    year: smallint("year"),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    check("person_dates_month_check", sql`${t.month} between 1 and 12`),
+    check("person_dates_day_check", sql`${t.day} between 1 and 31`),
+    check("person_dates_year_check", sql`${t.year} is null or ${t.year} between 1900 and 2100`),
+    index().on(t.personId),
+  ],
 );
 
 export const visits = pgTable(

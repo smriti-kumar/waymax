@@ -5,7 +5,9 @@ import { db, sqlClient } from "@/server/db/client";
 import { conversations, devices, notifications, people, visits } from "@/server/db/schema";
 import { dayBounds, localDate } from "@/lib/schedule";
 import { mediaUrl } from "@/server/storage";
+import { friendlyDeliveryError } from "@/lib/delivery";
 import { getPatient, lastLocation } from "./patients";
+import { upcomingDates } from "./dates";
 
 /** Continuous-aggregate bucket timezone (fixed for the demo, PLAN §4). */
 export const AGG_TZ = "America/New_York";
@@ -128,12 +130,19 @@ export async function buildDashboard(pid: string, now = new Date()) {
       status.geolocation && status.geolocation !== "ok" ? `location ${status.geolocation === "denied" ? "is turned off" : "isn't working"}` : null,
     ].filter(Boolean);
     if (problems.length) {
-      flags.push({ kind: "device_problem", message: `${d.label}: ${problems.join(", ")}. The manual "Who's here?" still works.`, deviceId: d.id, at: (status as { at?: string }).at ?? null });
+      flags.push({ kind: "device_problem", message: `${d.label}: ${problems.join(", ")}.`, deviceId: d.id, at: (status as { at?: string }).at ?? null });
     }
   }
   for (const f of failedAlerts) {
-    flags.push({ kind: "alert_failed", message: `iMessage for "${f.title}" couldn't be delivered. ${f.error ?? ""}`.trim(), notificationId: f.id, at: f.createdAt.toISOString() });
+    flags.push({ kind: "alert_failed", message: `The text alert "${f.title}" didn't reach everyone. ${friendlyDeliveryError(f.error)}`, notificationId: f.id, at: f.createdAt.toISOString() });
   }
+
+  // A stable id per occurrence, so the caregiver can dismiss one and only see it
+  // again if the problem happens again.
+  const withIds = flags.map((f) => {
+    const ref = "conversationId" in f ? f.conversationId : "deviceId" in f ? f.deviceId : f.notificationId;
+    return { ...f, id: `${f.kind}:${ref}:${f.at ?? ""}` };
+  });
 
   return {
     patient: { id: patient.id, name: patient.name, preferredName: patient.preferredName, timezone: tz, homeLabel: patient.homeLabel },
@@ -152,6 +161,7 @@ export async function buildDashboard(pid: string, now = new Date()) {
       minutes: Math.max(1, Math.round((v.lastSeenAt.getTime() - v.startedAt.getTime()) / 60000)),
     })),
     confusionToday: Number(confusedToday[0]?.n ?? 0),
+    upcomingDates: await upcomingDates(pid, localDate(now, tz), 30),
     devices: devs.map((d) => ({
       id: d.id,
       kind: d.kind,
@@ -159,6 +169,6 @@ export async function buildDashboard(pid: string, now = new Date()) {
       lastSeenAt: d.lastSeenAt,
       online: !!d.lastSeenAt && now.getTime() - d.lastSeenAt.getTime() < 2 * 60_000,
     })),
-    flags,
+    flags: withIds,
   };
 }

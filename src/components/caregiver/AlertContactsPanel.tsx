@@ -23,11 +23,14 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
     setBusy("add");
     setMsg(null);
     try {
-      await api(key, {
+      const r = await api<{ contact: { registration?: string } }>(key, {
         method: "POST",
         json: { name: f.get("name"), phoneE164: String(f.get("phone")).replace(/[\s()-]/g, ""), notifyGeofence: true },
       });
       form.reset();
+      const reg = r.contact.registration;
+      if (reg === "registered" || reg === "already") setMsg({ tone: "ok", text: "Added. This number is ready for text alerts." });
+      else if (reg === "failed") setMsg({ tone: "warn", text: "Added. We couldn't set this number up for texts yet — we'll try again when an alert is sent." });
       mutate();
     } catch (err) {
       setMsg({ tone: "warn", text: err instanceof ApiClientError ? err.message : "Couldn't add" });
@@ -43,8 +46,8 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
       const r = await api<{ configured: boolean; results: TestResult[]; message?: string }>(`${key}/test`, { method: "POST" });
       setMsg(
         r.configured
-          ? { tone: "ok", text: "Test iMessage sent. Check the phones.", results: r.results }
-          : { tone: "warn", text: r.message ?? "Photon not set up yet — alerts show here in the app only." },
+          ? { tone: "ok", text: "Test message sent. Check the phones.", results: r.results }
+          : { tone: "warn", text: r.message ?? "Text alerts aren't switched on yet — alerts show here in the app for now." },
       );
     } catch (err) {
       const e = err as ApiClientError;
@@ -84,20 +87,23 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
           ))}
         </ul>
       )}
-      <form onSubmit={add} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-        <Field label="Name">
-          <Input name="name" required maxLength={80} placeholder="Raj" />
-        </Field>
-        <Field label="iPhone number" hint="With country code, like +16075551234">
-          <Input name="phone" type="tel" required placeholder="+1…" />
-        </Field>
-        <Button type="submit" loading={busy === "add"} variant="secondary">
-          Add number
-        </Button>
+      <form onSubmit={add} className="flex flex-col gap-1">
+        <div className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <Field label="Name">
+            <Input name="name" required maxLength={80} placeholder="Raj" />
+          </Field>
+          <Field label="iPhone number">
+            <Input name="phone" type="tel" required placeholder="+16075551234" />
+          </Field>
+          <Button type="submit" loading={busy === "add"} variant="secondary" className="h-[46px]">
+            Add number
+          </Button>
+        </div>
+        <p className="text-sm text-ink-soft">Include the country code, like +1 for the US.</p>
       </form>
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={test} loading={busy === "test"} disabled={!contacts.length}>
-          Send test iMessage
+          Send test message
         </Button>
       </div>
       {msg && (
@@ -105,12 +111,15 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
           <p className="font-semibold">{msg.text}</p>
           {msg.results && (
             <ul className="mt-1 text-sm">
-              {msg.results.map((r) => (
-                <li key={r.phoneE164}>
-                  {r.phoneE164}: {r.status}
-                  {r.error ? ` — ${r.error}` : ""}
-                </li>
-              ))}
+              {msg.results.map((r) => {
+                const who = contacts.find((c) => c.phoneE164 === r.phoneE164)?.name ?? r.phoneE164;
+                return (
+                  <li key={r.phoneE164}>
+                    {r.status === "sent" ? "✓" : r.status === "skipped" ? "–" : "✕"} {who}:{" "}
+                    {r.status === "sent" ? "delivered" : r.status === "skipped" ? "not sent" : (r.error ?? "didn't go through")}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

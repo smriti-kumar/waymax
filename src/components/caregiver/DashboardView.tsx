@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/client/api";
 import { ago } from "@/client/format";
@@ -21,11 +22,38 @@ type Dashboard = {
   visitsToday: { id: string; name: string; relationship: string; photoUrl: string | null; timeText: string; minutes: number }[];
   confusionToday: number;
   devices: { id: string; kind: string; label: string; lastSeenAt: string | null; online: boolean }[];
-  flags: { kind: string; message: string }[];
+  flags: { id: string; kind: string; message: string }[];
+  upcomingDates: { id: string; days: number; dateText: string; text: string }[];
 };
 type Confusion = { daily: { day: string; n: number }[]; byHour: { hour: number; n: number }[]; insight?: string | null };
 
+/** Flags this caregiver dismissed, remembered per browser. */
+function useDismissed(pid: string) {
+  const key = `waymax:dismissed-flags:${pid}`;
+  // Flags render only after client-side data loads, so reading storage here can't cause a hydration mismatch.
+  const [ids, setIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(localStorage.getItem(key) ?? "[]");
+    } catch {
+      return [];
+    }
+  });
+  const dismiss = (more: string[]) =>
+    setIds((cur) => {
+      const next = [...new Set([...cur, ...more])].slice(-200);
+      try {
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {
+        /* private mode: dismissal lasts until reload */
+      }
+      return next;
+    });
+  return { ids, dismiss };
+}
+
 export function DashboardView({ pid }: { pid: string }) {
+  const dismissed = useDismissed(pid);
   const dash = useSWR<Dashboard>(`/api/patients/${pid}/dashboard`, fetcher, { refreshInterval: 5000 });
   const conf = useSWR<Confusion>(`/api/patients/${pid}/confusion?days=14`, fetcher, { refreshInterval: 10_000 });
   const d = dash.data;
@@ -40,20 +68,41 @@ export function DashboardView({ pid }: { pid: string }) {
       </div>
     );
 
+  const visibleFlags = d.flags.filter((f) => !dismissed.ids.includes(f.id));
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="md:col-span-2">
         <StatusTile state={d.geofenceState} changedAt={d.geofenceStateChangedAt} label={d.patient.homeLabel} lastAt={d.lastLocation?.recordedAt ?? null} />
       </div>
 
-      {d.flags.length > 0 && (
+      {visibleFlags.length > 0 && (
         <Card className="md:col-span-2 border-sun bg-[#fffaf0]" data-testid="flags">
-          <CardTitle className="mb-2">Needs a look</CardTitle>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <CardTitle>Needs a look</CardTitle>
+            <button
+              onClick={() => dismissed.dismiss(visibleFlags.map((f) => f.id))}
+              className="rounded-lg px-2 py-1 text-sm font-semibold text-ink-soft hover:bg-sand"
+              aria-label="Dismiss all"
+              data-testid="flags-dismiss-all"
+            >
+              Dismiss all ✕
+            </button>
+          </div>
           <ul className="flex flex-col gap-1">
-            {d.flags.map((f, i) => (
-              <li key={i} className="text-ink">
-                <span aria-hidden>⚠︎ </span>
-                {f.message}
+            {visibleFlags.map((f) => (
+              <li key={f.id} className="flex items-start justify-between gap-3 text-ink">
+                <span>
+                  <span aria-hidden>⚠︎ </span>
+                  {f.message}
+                </span>
+                <button
+                  onClick={() => dismissed.dismiss([f.id])}
+                  aria-label={`Dismiss: ${f.message}`}
+                  className="flex-none rounded-lg px-2 text-lg leading-6 text-ink-soft hover:bg-sand"
+                >
+                  ✕
+                </button>
               </li>
             ))}
           </ul>
@@ -107,6 +156,23 @@ export function DashboardView({ pid }: { pid: string }) {
       </Card>
 
       <div className="flex flex-col gap-4">
+        <Card>
+          <CardTitle className="mb-2">Coming up</CardTitle>
+          {d.upcomingDates.length === 0 ? (
+            <p className="text-ink-soft">No birthdays or anniversaries in the next 30 days. Add them on each person&apos;s page.</p>
+          ) : (
+            <ul className="flex flex-col gap-1" data-testid="upcoming-dates">
+              {d.upcomingDates.map((u) => (
+                <li key={u.id} className="flex justify-between gap-3">
+                  <span>{u.text}</span>
+                  <span className={u.days === 0 ? "font-semibold text-leaf" : "text-ink-soft"}>
+                    {u.days === 0 ? "today" : u.days === 1 ? "tomorrow" : `${u.dateText} · in ${u.days} days`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
         <Card>
           <CardTitle className="mb-2">Waiting for approval</CardTitle>
           {d.pendingPeople > 0 ? (

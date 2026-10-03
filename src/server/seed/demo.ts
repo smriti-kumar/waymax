@@ -9,6 +9,7 @@ import {
   patientEvents,
   patients,
   people,
+  personDates,
   personMemories,
   questions,
   scheduleItems,
@@ -165,6 +166,13 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
       await db().insert(personMemories).values({ personId: row.id, kind: "photo", title: m.title, body: m.body, occurredOn: m.occurredOn, mediaId: scene.id });
     }
   }
+
+  // Important dates.
+  await db().insert(personDates).values([
+    { personId: ids.priya!, kind: "birthday", month: 5, day: 14, year: 1988 },
+    { personId: ids.raj!, kind: "birthday", month: 11, day: 2, year: 1985 },
+    { personId: ids.raj!, kind: "anniversary", label: "Raj and Anita's wedding anniversary", month: 9, day: 12, year: 2015 },
+  ]);
 
   // Weekly schedule.
   const weekly = (title: string, kind: "visit" | "activity" | "therapy" | "meal" | "other", days: readonly number[], time: string, durationMin = 60, personId: string | null = null) => ({

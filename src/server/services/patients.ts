@@ -56,7 +56,7 @@ export async function getPatientDetail(pid: string) {
 
 export async function updatePatient(
   pid: string,
-  patch: Partial<{ name: string; preferredName: string; timezone: string; homeLabel: string }>,
+  patch: Partial<{ name: string; preferredName: string; timezone: string; homeLabel: string; faceMatchThreshold: number | null }>,
 ) {
   const [p] = await db().update(patients).set(patch).where(eq(patients.id, pid)).returning();
   if (!p) throw notFound("Patient not found");

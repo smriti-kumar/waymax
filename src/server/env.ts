@@ -29,12 +29,20 @@ export const envSchema = z.object({
   SPECTRUM_PROJECT_ID: optionalString,
   SPECTRUM_PROJECT_SECRET: optionalString,
   SPECTRUM_WEBHOOK_SECRET: optionalString,
+  /** Photon dashboard login token (from `photon login`), used to register alert numbers automatically. */
+  PHOTON_DASHBOARD_TOKEN: optionalString,
+  PHOTON_API_HOST: optionalString,
+  /** Firebase Admin (service account) — verifies Firebase sign-ins on the server. */
+  FIREBASE_PROJECT_ID: optionalString,
+  FIREBASE_CLIENT_EMAIL: optionalString,
+  FIREBASE_PRIVATE_KEY: optionalString,
   DEMO_ALERT_PHONE: optionalString,
 
   GEMINI_MODEL: z.preprocess(blankToUndefined, z.string().default("gemini-3-flash-preview")),
   GEMINI_FALLBACK_MODEL: z.preprocess(blankToUndefined, z.string().default("gemini-3.1-flash-lite")),
   ELEVENLABS_VOICE_ID: optionalString,
   ELEVENLABS_MODEL_ID: z.preprocess(blankToUndefined, z.string().default("eleven_flash_v2_5")),
+  ELEVENLABS_STT_MODEL: z.preprocess(blankToUndefined, z.string().default("scribe_v1")),
   TTS_MONTHLY_CHAR_BUDGET: z.preprocess(blankToUndefined, z.coerce.number().int().positive().default(18000)),
   NOTIFY_MODE: z.preprocess(blankToUndefined, z.enum(["photon", "in_app"]).default("in_app")),
   AI_MOCK: boolString(false),
@@ -42,7 +50,12 @@ export const envSchema = z.object({
 
   NEXT_PUBLIC_APP_URL: z.preprocess(blankToUndefined, z.string().default("http://localhost:3000")),
   NEXT_PUBLIC_DEMO_MODE: boolString(false),
-  NEXT_PUBLIC_FACE_MATCH_THRESHOLD: z.preprocess(blankToUndefined, z.coerce.number().min(0).max(1).default(0.55)),
+  NEXT_PUBLIC_FIREBASE_API_KEY: optionalString,
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: optionalString,
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: optionalString,
+  NEXT_PUBLIC_FIREBASE_APP_ID: optionalString,
+  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: optionalString,
+  NEXT_PUBLIC_FACE_MATCH_THRESHOLD: z.preprocess(blankToUndefined, z.coerce.number().min(0).max(1).default(0.68)),
 });
 
 export type RawEnv = z.infer<typeof envSchema>;
@@ -50,6 +63,8 @@ export type RawEnv = z.infer<typeof envSchema>;
 export type ProviderMode = "live" | "mock";
 
 export interface Env extends RawEnv {
+  /** "firebase" when both the browser config and the server service account are set. */
+  authMode: "firebase" | "password";
   geminiMode: ProviderMode;
   ttsMode: ProviderMode;
   /** Effective notify mode: photon only when requested AND keys are present. */
@@ -87,7 +102,12 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
     warnings.push("SPECTRUM_PROJECT_ID/SECRET missing: alerts are in-app only");
   }
 
-  return { ...raw, geminiMode, ttsMode, notifyMode, warnings };
+  const firebaseServer = !!(raw.FIREBASE_PROJECT_ID && raw.FIREBASE_CLIENT_EMAIL && raw.FIREBASE_PRIVATE_KEY);
+  const firebaseClient = !!(raw.NEXT_PUBLIC_FIREBASE_API_KEY && raw.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
+  const authMode = firebaseServer && firebaseClient ? "firebase" : "password";
+  if (firebaseServer !== firebaseClient) warnings.push("Firebase is half-configured (browser and server keys must both be set): using password sign-in");
+
+  return { ...raw, authMode, geminiMode, ttsMode, notifyMode, warnings };
 }
 
 let cached: Env | undefined;

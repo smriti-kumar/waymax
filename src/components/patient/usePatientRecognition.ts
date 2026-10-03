@@ -79,6 +79,7 @@ export function usePatientRecognition(enabled: boolean) {
     if (!gallery) return;
     const people = gallery.people.map((p) => ({ ...p }));
     matcher.current.setGallery(people);
+    matcher.current.setThreshold(gallery.threshold);
     engineRef.current?.mock?.setGallery(people);
   }, [gallery]);
 
@@ -169,10 +170,6 @@ export function usePatientRecognition(enabled: boolean) {
         console.warn("[face] add person failed", err);
         return false;
       }
-    },
-    pickManually: (personId: string) => {
-      dismissedUntil.current.delete(personId);
-      return choose(personId, 1, "manual");
     },
   };
 }

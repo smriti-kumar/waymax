@@ -12,7 +12,10 @@ import { Skeleton } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
 import type { MapFence, MapPoint } from "./FenceMapInner";
 
-const FenceMap = dynamic(() => import("./FenceMapInner"), { ssr: false, loading: () => <Skeleton className="h-[420px]" /> });
+// Google Maps when a browser key is configured, otherwise OpenStreetMap (no key needed).
+const FenceMap = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  ? dynamic(() => import("./GoogleFenceMap"), { ssr: false, loading: () => <Skeleton className="h-[420px]" /> })
+  : dynamic(() => import("./FenceMapInner"), { ssr: false, loading: () => <Skeleton className="h-[420px]" /> });
 
 const DEFAULT_CENTER = { lat: 42.444, lng: -76.5019 }; // Ithaca, NY
 const DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "true";

@@ -65,7 +65,7 @@ describeDb("geofence and location", () => {
     expect(home.body.state).toBe("inside");
     expect(await kinds(p.id)).toEqual(["geofence_exit", "geofence_return"]);
     const n = (await db().select().from(notifications).where(eq(notifications.kind, "geofence_exit")))[0];
-    expect(n.body).toMatch(/^Waymax: Maggie has left Home\. Last seen .+, \d+(\.\d)? (m|km) away: https:\/\/www\.openstreetmap\.org\//);
+    expect(n.body).toMatch(/^Waymax: Maggie has left Home\. Last seen .+, \d+(\.\d)? (m|km) away: https:\/\/www\.google\.com\/maps\//);
     expect(n.photonStatus).toBe("skipped");
     const pings = await db().select().from(locationPings).where(eq(locationPings.patientId, p.id));
     expect(pings.every((x) => x.source === "simulated")).toBe(true);

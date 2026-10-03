@@ -2,7 +2,7 @@ import "server-only";
 import { and, asc, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { db } from "@/server/db/client";
-import { faceEmbeddings, people, personMemories } from "@/server/db/schema";
+import { faceEmbeddings, people, personDates, personMemories } from "@/server/db/schema";
 import { isUuid, requireCaregiverFor } from "@/server/auth/guards";
 import { notFound, unprocessable } from "@/server/http/errors";
 import { mediaUrl, storage } from "@/server/storage";
@@ -230,13 +230,18 @@ export async function deleteMemory(personId: string, memoryId: string) {
 
 export async function personDetail(personId: string): Promise<PersonDetail> {
   const person = await personSummary(personId);
-  const [embMedia, memories] = await Promise.all([
+  const [embMedia, memories, dates] = await Promise.all([
     db()
       .select({ mediaId: faceEmbeddings.mediaId, n: count() })
       .from(faceEmbeddings)
       .where(and(eq(faceEmbeddings.personId, personId), isNotNull(faceEmbeddings.mediaId)))
       .groupBy(faceEmbeddings.mediaId),
     listMemories(personId),
+    db()
+      .select({ id: personDates.id, kind: personDates.kind, label: personDates.label, month: personDates.month, day: personDates.day, year: personDates.year })
+      .from(personDates)
+      .where(eq(personDates.personId, personId))
+      .orderBy(asc(personDates.month), asc(personDates.day)),
   ]);
   const ids = new Map<string, { hasEmbedding: boolean }>();
   if (person.primaryPhotoId) ids.set(person.primaryPhotoId, { hasEmbedding: false });
@@ -248,7 +253,7 @@ export async function personDetail(personId: string): Promise<PersonDetail> {
     hasEmbedding: v.hasEmbedding,
     isPrimary: mediaId === person.primaryPhotoId,
   }));
-  return { person, photos, memories };
+  return { person, photos, memories, dates };
 }
 
 export async function peopleByIds(ids: string[]) {

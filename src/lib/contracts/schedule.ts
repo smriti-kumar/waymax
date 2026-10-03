@@ -56,4 +56,6 @@ export type TodayResponse = {
   items: TodayItem[];
   nextText: string | null;
   emptyText: string | null;
+  /** "It's Priya's birthday today." lines for dates that fall today. */
+  specialToday: string[];
 };

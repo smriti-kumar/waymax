@@ -4,6 +4,8 @@ import { db } from "@/server/db/client";
 import { alertContacts } from "@/server/db/schema";
 import { conflict, notFound } from "@/server/http/errors";
 import { isUuid } from "@/server/auth/guards";
+import { notifyMode } from "@/server/notify";
+import { registerPhotonUser } from "@/server/notify/photon-users";
 
 const cols = { id: alertContacts.id, name: alertContacts.name, phoneE164: alertContacts.phoneE164, notifyGeofence: alertContacts.notifyGeofence };
 
@@ -14,7 +16,9 @@ export async function listContacts(pid: string) {
 export async function addContact(pid: string, input: { name: string; phoneE164: string; notifyGeofence: boolean }) {
   const rows = await db().insert(alertContacts).values({ patientId: pid, ...input }).onConflictDoNothing().returning(cols);
   if (!rows.length) throw conflict("That number is already on the list");
-  return rows[0]!;
+  // Shared Photon lines only text registered numbers, so register it right away.
+  const registration = notifyMode() === "photon" ? await registerPhotonUser(input.phoneE164, input.name) : "skipped";
+  return { ...rows[0]!, registration };
 }
 
 export async function deleteContact(pid: string, cid: string) {
