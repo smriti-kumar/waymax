@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Waymax palette: warm, high contrast, never red. */
+@theme {
+  --color-cream: #fbf6ee;
+  --color-sand: #f1e6d4;
+  --color-ink: #2b2118;
+  --color-ink-soft: #5c4a3a;
+  --color-sun: #e9a23b;
+  --color-sun-deep: #b8731a;
+  --color-sea: #2f6f73;
+  --color-sea-deep: #1f4f52;
+  --color-leaf: #4f7a3a;
+  --color-sky: #dfeef0;
+  --color-line: #e2d5c1;
+  --font-sans: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-sea);
+  outline-offset: 3px;
+}
+
+@keyframes wm-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+.wm-pulse {
+  animation: wm-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes wm-slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.wm-slide-up {
+  animation: wm-slide-up 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-pulse, .wm-slide-up { animation: none; }
+}
