@@ -98,11 +98,43 @@ export function notifyMode(): "photon" | "in_app" {
   return overrides.mode ?? env().notifyMode;
 }
 
+/**
+ * Wraps a sender: numbers rejected as "not allowed" are registered with Photon
+ * and retried once, so contacts added before auto-registration also work.
+ */
+export class RegisteringSender implements MessageSender {
+  readonly name: string;
+  constructor(
+    private inner: MessageSender,
+    private register: (phone: string) => Promise<"registered" | "already" | "skipped" | "failed">,
+  ) {
+    this.name = inner.name;
+  }
+  async sendMany(phones: string[], text: string): Promise<SendResult[]> {
+    const first = await this.inner.sendMany(phones, text);
+    const blocked = first.filter((r) => !r.ok && /not allowed|not registered/i.test(r.error ?? ""));
+    if (!blocked.length) return first;
+    const fixed: string[] = [];
+    for (const b of blocked) {
+      const reg = await this.register(b.phoneE164);
+      if (reg === "registered" || reg === "already") fixed.push(b.phoneE164);
+    }
+    if (!fixed.length) return first;
+    const retry = new Map((await this.inner.sendMany(fixed, text)).map((r) => [r.phoneE164, r]));
+    return first.map((r) => retry.get(r.phoneE164) ?? r);
+  }
+}
+
 export function messageSender(): MessageSender {
   if (overrides.sender) return overrides.sender;
   const e = env();
   if (notifyMode() === "photon" && e.SPECTRUM_PROJECT_ID && e.SPECTRUM_PROJECT_SECRET) {
-    return new PhotonMessageSender(e.SPECTRUM_PROJECT_ID, e.SPECTRUM_PROJECT_SECRET);
+    const photon = new PhotonMessageSender(e.SPECTRUM_PROJECT_ID, e.SPECTRUM_PROJECT_SECRET);
+    if (!e.PHOTON_DASHBOARD_TOKEN) return photon;
+    return new RegisteringSender(photon, async (phone) => {
+      const { registerPhotonUser } = await import("./photon-users");
+      return registerPhotonUser(phone, "Caregiver");
+    });
   }
   return new NoopSender();
 }

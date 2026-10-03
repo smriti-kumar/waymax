@@ -23,11 +23,14 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
     setBusy("add");
     setMsg(null);
     try {
-      await api(key, {
+      const r = await api<{ contact: { registration?: string } }>(key, {
         method: "POST",
         json: { name: f.get("name"), phoneE164: String(f.get("phone")).replace(/[\s()-]/g, ""), notifyGeofence: true },
       });
       form.reset();
+      const reg = r.contact.registration;
+      if (reg === "registered" || reg === "already") setMsg({ tone: "ok", text: "Added. This number is ready for text alerts." });
+      else if (reg === "failed") setMsg({ tone: "warn", text: "Added. We couldn't set this number up for texts yet — we'll try again when an alert is sent." });
       mutate();
     } catch (err) {
       setMsg({ tone: "warn", text: err instanceof ApiClientError ? err.message : "Couldn't add" });

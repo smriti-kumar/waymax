@@ -29,6 +29,9 @@ export const envSchema = z.object({
   SPECTRUM_PROJECT_ID: optionalString,
   SPECTRUM_PROJECT_SECRET: optionalString,
   SPECTRUM_WEBHOOK_SECRET: optionalString,
+  /** Photon dashboard login token (from `photon login`), used to register alert numbers automatically. */
+  PHOTON_DASHBOARD_TOKEN: optionalString,
+  PHOTON_API_HOST: optionalString,
   DEMO_ALERT_PHONE: optionalString,
 
   GEMINI_MODEL: z.preprocess(blankToUndefined, z.string().default("gemini-3-flash-preview")),
