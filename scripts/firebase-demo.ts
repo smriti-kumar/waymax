@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { getAuth } from "firebase-admin/auth";
 import { closeDb, db } from "../src/server/db/client";
 import { caregivers } from "../src/server/db/schema";
-import { firebaseAdmin } from "../src/server/auth/firebase";
+import { firebaseAdmin } from "../src/server/auth/firebase-admin";
 import { DEMO_EMAIL, DEMO_PASSWORD } from "../src/server/seed/demo";
 
 async function main() {
