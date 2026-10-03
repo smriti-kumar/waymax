@@ -2,6 +2,10 @@
 import { useState, type ReactNode } from "react";
 import { requestMediaPermissions, unlockAudio, within } from "@/client/audio-unlock";
 
+// Survives client-side navigation between patient screens (same document, audio
+// already unlocked); a full reload needs a fresh gesture, so it starts false again.
+let startedThisDocument = false;
+
 /**
  * One tap before anything else: unlocks audio, asks for camera + mic, and goes
  * full screen (Esc leaves full screen).
@@ -16,7 +20,7 @@ export function StartGate({
   children: ReactNode;
   onStarted?: (perm: { camera: boolean; mic: boolean }) => void;
 }) {
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(startedThisDocument);
   const [busy, setBusy] = useState(false);
   if (started) return <>{children}</>;
   return (
@@ -35,6 +39,7 @@ export function StartGate({
           }
           const perm = await requestMediaPermissions();
           onStarted?.(perm);
+          startedThisDocument = true;
           setStarted(true);
         }}
         className="min-h-[120px] min-w-[360px] rounded-[40px] bg-sea px-12 text-[48px] font-bold text-white shadow-md hover:bg-sea-deep"
