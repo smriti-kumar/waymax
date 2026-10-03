@@ -20,7 +20,7 @@ pnpm db:seed              # demo account (add `-- --force` to rebuild it)
 pnpm dev                  # http://localhost:3000
 ```
 
-With no API keys (or `AI_MOCK=true`) everything still works: Gemini is mocked, speech uses the browser voice, and alerts are in-app only. `/api/health` shows which providers are live.
+Caregiver sign-in uses Firebase Authentication when the `NEXT_PUBLIC_FIREBASE_*` web config and the `FIREBASE_*` service account are set; otherwise it falls back to built-in email + password. With no API keys (or `AI_MOCK=true`) everything still works: Gemini is mocked, speech uses the browser voice, and alerts are in-app only. `/api/health` shows which providers are live.
 
 | Command | What it does |
 | --- | --- |
@@ -33,7 +33,7 @@ With no API keys (or `AI_MOCK=true`) everything still works: Gemini is mocked, s
 
 ## Demo login
 
-- Caregiver: **`demo@waymax.app` / `waymax-demo`**
+- Caregiver: **`demo@waymax.app` / `waymax-demo`** (a Firebase Authentication account, project `waymax-ae1c3`; recreate it with `pnpm firebase:demo`)
 - Patient: Margaret Lee ("Maggie"), home area 150 m around Ithaca Commons
 - People: Priya (daughter), Raj (son), Sam (neighbor), Nora (home helper) — with placeholder photos. **Before the demo, add 3 real face photos of each teammate** on their person page (or rename a seeded person to a teammate and replace the photos), so the laptop recognizes real faces.
 
