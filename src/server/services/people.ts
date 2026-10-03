@@ -27,7 +27,7 @@ export async function personForCaregiver(req: NextRequest, personId: string) {
 /** Primary photo, else the first enrollment photo. */
 const photoIdExpr = sql<string | null>`coalesce(${people.primaryPhotoId}, (
   select fe.media_id from face_embeddings fe
-  where fe.person_id = ${people.id} and fe.media_id is not null
+  where fe.person_id = "people"."id" and fe.media_id is not null
   order by fe.created_at asc limit 1))`;
 
 const summaryCols = {
@@ -42,7 +42,7 @@ const summaryCols = {
   photoId: photoIdExpr,
   createdVia: people.createdVia,
   createdAt: people.createdAt,
-  embeddingCount: sql<number>`(select count(*)::int from face_embeddings fe where fe.person_id = ${people.id})`,
+  embeddingCount: sql<number>`(select count(*)::int from face_embeddings fe where fe.person_id = "people"."id")`,
 };
 
 type SummaryRow = {
