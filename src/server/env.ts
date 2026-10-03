@@ -35,6 +35,7 @@ export const envSchema = z.object({
   GEMINI_FALLBACK_MODEL: z.preprocess(blankToUndefined, z.string().default("gemini-3.1-flash-lite")),
   ELEVENLABS_VOICE_ID: optionalString,
   ELEVENLABS_MODEL_ID: z.preprocess(blankToUndefined, z.string().default("eleven_flash_v2_5")),
+  ELEVENLABS_STT_MODEL: z.preprocess(blankToUndefined, z.string().default("scribe_v1")),
   TTS_MONTHLY_CHAR_BUDGET: z.preprocess(blankToUndefined, z.coerce.number().int().positive().default(18000)),
   NOTIFY_MODE: z.preprocess(blankToUndefined, z.enum(["photon", "in_app"]).default("in_app")),
   AI_MOCK: boolString(false),

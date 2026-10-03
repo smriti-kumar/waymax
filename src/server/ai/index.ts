@@ -1,6 +1,6 @@
 import "server-only";
 import { env } from "@/server/env";
-import { ElevenLabsTTS } from "./elevenlabs";
+import { ElevenLabsTranscriber, ElevenLabsTTS, FallbackTranscriber } from "./elevenlabs";
 import { GeminiClient, GeminiInsightWriter, GeminiNarrator, GeminiSummarizer, GeminiTranscriber } from "./gemini";
 import type { InsightWriter, Narrator, Summarizer, TextToSpeech, Transcriber } from "./interfaces";
 import { MockInsightWriter, MockNarrator, MockSummarizer, MockTranscriber } from "./mocks";
@@ -36,10 +36,16 @@ function gemini(): GeminiClient | null {
   return new GeminiClient(e.GEMINI_API_KEY!, e.GEMINI_MODEL, e.GEMINI_FALLBACK_MODEL);
 }
 
+/** ElevenLabs Scribe first (better at real-room speech), Gemini as backup; mock without keys. */
 export function transcriber(): Transcriber {
   if (overrides.transcriber) return overrides.transcriber;
+  const e = env();
+  const chain: Transcriber[] = [];
+  if (!e.AI_MOCK && e.ELEVENLABS_API_KEY) chain.push(new ElevenLabsTranscriber(e.ELEVENLABS_API_KEY, e.ELEVENLABS_STT_MODEL));
   const g = gemini();
-  return g ? new GeminiTranscriber(g) : new MockTranscriber();
+  if (g) chain.push(new GeminiTranscriber(g));
+  if (!chain.length) return new MockTranscriber();
+  return chain.length === 1 ? chain[0]! : new FallbackTranscriber(chain);
 }
 
 export function summarizer(): Summarizer {
