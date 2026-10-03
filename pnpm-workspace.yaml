@@ -4,3 +4,4 @@ allowBuilds:
   esbuild: true
   protobufjs: false
   '@google/genai': false
+  '@firebase/util': false

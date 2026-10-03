@@ -20,6 +20,14 @@ async function main() {
       NEXT_PUBLIC_DEMO_MODE: "true",
       NEXT_PUBLIC_APP_URL: `http://localhost:${port}`,
       NEXT_DIST_DIR: ".next-e2e",
+      // E2E uses the built-in password sign-in, the OpenStreetMap map and no real messaging.
+      NEXT_PUBLIC_FIREBASE_API_KEY: "",
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: "",
+      FIREBASE_PROJECT_ID: "",
+      FIREBASE_CLIENT_EMAIL: "",
+      FIREBASE_PRIVATE_KEY: "",
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: "",
+      PHOTON_DASHBOARD_TOKEN: "",
     },
   });
   const stop = () => child.kill("SIGTERM");

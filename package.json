@@ -23,15 +23,19 @@
     "verify:gemini": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/verify-gemini-models.ts",
     "postinstall": "node scripts/copy-human-models.mjs && node scripts/list-calm-tracks.mjs",
     "predev": "node scripts/list-calm-tracks.mjs",
-    "prebuild": "node scripts/list-calm-tracks.mjs"
+    "prebuild": "node scripts/list-calm-tracks.mjs",
+    "firebase:demo": "tsx --conditions=react-server --env-file-if-exists=.env.local scripts/firebase-demo.ts"
   },
   "dependencies": {
     "@google/genai": "2.26.0",
+    "@vis.gl/react-google-maps": "1.10.1",
     "@vladmandic/human": "3.3.6",
     "bcryptjs": "3.0.3",
     "date-fns": "4.4.0",
     "date-fns-tz": "3.2.0",
     "drizzle-orm": "0.45.3",
+    "firebase": "12.19.0",
+    "firebase-admin": "14.5.0",
     "leaflet": "1.9.4",
     "next": "16.3.8",
     "postgres": "3.4.9",

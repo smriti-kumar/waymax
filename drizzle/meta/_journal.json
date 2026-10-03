@@ -29,6 +29,13 @@
       "when": 1791044342844,
       "tag": "0003_person_dates",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791045005163,
+      "tag": "0004_firebase_uid",
+      "breakpoints": true
     }
   ]
 }

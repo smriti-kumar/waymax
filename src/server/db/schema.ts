@@ -72,6 +72,8 @@ export const caregivers = pgTable("caregivers", {
   passwordHash: text("password_hash").notNull(),
   name: text("name").notNull(),
   phoneE164: text("phone_e164"),
+  /** Firebase Authentication uid when the caregiver signs in with Firebase. */
+  firebaseUid: text("firebase_uid").unique(),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 

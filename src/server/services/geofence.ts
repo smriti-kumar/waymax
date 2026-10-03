@@ -6,7 +6,7 @@ import { geofences, locationPings, patients } from "@/server/db/schema";
 import { conflict, notFound, unprocessable } from "@/server/http/errors";
 import { isUuid } from "@/server/auth/guards";
 import { evaluatePing, type Evaluation } from "@/lib/geofence";
-import { formatDistance, offsetPoint, osmLink, pickActiveFence } from "@/lib/geo";
+import { formatDistance, mapsLink, offsetPoint, pickActiveFence } from "@/lib/geo";
 import { sendGeofenceAlert } from "./notify";
 
 type Source = "browser" | "shortcut" | "simulated" | "device";
@@ -101,7 +101,7 @@ export async function recordPing(
     const name = patient.preferredName;
     const exit = ev.transition === "exit";
     const body = exit
-      ? `Waymax: ${name} has left ${fence.label}. Last seen ${time}, ${formatDistance(ev.distanceM ?? 0)} away: ${osmLink(ping)}`
+      ? `Waymax: ${name} has left ${fence.label}. Last seen ${time}, ${formatDistance(ev.distanceM ?? 0)} away: ${mapsLink(ping)}`
       : `Waymax: ${name} is back at ${fence.label} (${time}).`;
     await sendGeofenceAlert({
       patientId: pid,

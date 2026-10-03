@@ -21,6 +21,8 @@ export async function GET() {
       gemini: e.geminiMode,
       tts: e.ttsMode,
       notify: e.notifyMode,
+      auth: e.authMode,
+      maps: e.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? "google" : "openstreetmap",
       demoMode: e.NEXT_PUBLIC_DEMO_MODE,
     },
     { status: db === "up" ? 200 : 503 },
