@@ -88,28 +88,28 @@ function PatientMain({ preferredName, timezone }: { preferredName: string; timez
       <TodayCard today={today} timezone={timezone} preferredName={preferredName} />
       {rec.card && <PersonCard card={rec.card} onClose={rec.dismissCard} />}
       {!rec.card && rec.unknown && (
-        <div role="status" data-testid="someone-here" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-sky px-8 py-6 text-[40px] font-bold text-sea-deep shadow-md">
+        <div role="status" data-testid="someone-here" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl border-4 border-sea bg-sky px-8 py-6 text-[40px] font-bold text-sea-deep shadow-md">
           Someone is here.
         </div>
       )}
       {recording && (
-        <div role="status" data-testid="recording" className="absolute right-10 top-6 z-30 flex items-center gap-4 rounded-full bg-white px-8 py-4 text-[36px] font-bold shadow-md">
+        <div role="status" data-testid="recording" className="absolute right-10 top-6 z-30 flex items-center gap-4 rounded-full border-4 border-sun-deep bg-white px-8 py-4 text-[36px] font-bold shadow-md">
           <span className="wm-pulse h-6 w-6 rounded-full bg-sun-deep" aria-hidden />
           {listen.state === "starting" ? "Starting…" : "Recording"}
         </div>
       )}
       {listen.result && !recording && (
-        <div role="status" data-testid="listen-saved" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl bg-[#e4efdc] px-8 py-6 text-[36px] font-semibold text-leaf shadow-md">
+        <div role="status" data-testid="listen-saved" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl border-4 border-leaf bg-leaf-wash px-8 py-6 text-[36px] font-bold text-leaf shadow-md">
           {listen.result.mightBe ? `This might be ${listen.result.mightBe.name}.` : "Saved. Thank you."}
         </div>
       )}
       {listen.problem && !recording && (
-        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl bg-sky px-8 py-6 text-[32px] font-semibold text-sea-deep shadow-md">
+        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-30 rounded-3xl border-4 border-sea bg-sky px-8 py-6 text-[32px] font-bold text-sea-deep shadow-md">
           {listen.problem}
         </div>
       )}
       {thanks && !rec.card && (
-        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl bg-[#e4efdc] px-8 py-6 text-[36px] font-semibold text-leaf shadow-md">
+        <div role="status" className="wm-slide-up absolute inset-x-10 top-6 z-10 rounded-3xl border-4 border-leaf bg-leaf-wash px-8 py-6 text-[36px] font-bold text-leaf shadow-md">
           Thank you. Your family will add their name.
         </div>
       )}

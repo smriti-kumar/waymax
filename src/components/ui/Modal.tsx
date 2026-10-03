@@ -24,16 +24,20 @@ export function Modal({
       ref={ref}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="m-auto w-[min(92vw,560px)] rounded-2xl border border-line bg-white p-0 text-ink shadow-xl backdrop:bg-ink/40"
+      className="m-auto w-[min(94vw,640px)] rounded-2xl border-4 border-ink bg-white p-0 text-ink shadow-xl backdrop:bg-ink/60"
       aria-label={title}
     >
-      <div className="flex items-center justify-between border-b border-line px-5 py-3">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <button onClick={onClose} className="rounded-lg px-2 py-1 text-ink-soft hover:bg-sand" aria-label="Close">
-          Close
+      <div className="flex items-center justify-between gap-4 border-b-2 border-line px-6 py-4">
+        <h2 className="text-2xl font-bold">{title}</h2>
+        <button
+          onClick={onClose}
+          className="min-h-12 rounded-xl border-2 border-line bg-white px-4 text-lg font-bold text-ink hover:bg-sand"
+          aria-label="Close"
+        >
+          ✕ Close
         </button>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-6">{children}</div>
     </dialog>
   );
 }

@@ -65,29 +65,34 @@ export function PersonEditor({ pid, personId }: { pid: string; personId: string 
           Upload 3 clear photos with just this person&apos;s face, looking at the camera. Each photo becomes a face sample.
         </p>
         {enrollment.banner && (
-          <p className="mb-4 rounded-xl bg-[#fff6e6] px-3 py-2 font-medium text-sun-deep" role="status">
+          <p className="mb-4 rounded-xl border-2 border-sun-deep bg-sun-wash px-4 py-3 font-bold text-sun-deep" role="status">
             {enrollment.banner}
           </p>
         )}
-        <div className="mb-4 grid grid-cols-3 gap-3 sm:grid-cols-5">
+        <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {photos.map((ph) => (
-            <figure key={ph.mediaId} className="relative">
+            <figure key={ph.mediaId} className="flex flex-col gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ph.url} alt="" className="aspect-square w-full rounded-xl object-cover" />
-              <figcaption className="mt-1 flex items-center justify-between text-xs text-ink-soft">
-                <span>{ph.hasEmbedding ? "face sample ✓" : ""}</span>
+              <img
+                src={ph.url}
+                alt=""
+                className={"aspect-square w-full rounded-xl border-4 object-cover " + (ph.isPrimary ? "border-sea" : "border-line")}
+              />
+              <figcaption className="flex flex-col gap-2">
+                {ph.hasEmbedding && <span className="font-bold text-leaf">✓ Face sample</span>}
                 {ph.isPrimary ? (
-                  <span className="font-semibold text-sea-deep">main photo</span>
+                  <span className="font-bold text-sea-deep">★ Main photo</span>
                 ) : (
-                  <button
-                    className="font-semibold text-sea-deep underline"
+                  <Button
+                    size="sm"
+                    variant="ghost"
                     onClick={async () => {
                       await api(key, { method: "PATCH", json: { primaryPhotoId: ph.mediaId } });
                       mutate();
                     }}
                   >
-                    make main
-                  </button>
+                    Make main photo
+                  </Button>
                 )}
               </figcaption>
             </figure>

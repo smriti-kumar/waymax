@@ -92,12 +92,12 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </Field>
       )}
       {error && (
-        <p role="alert" className="rounded-xl bg-[#fff6e6] px-3 py-2 font-medium text-sun-deep">
+        <p role="alert" className="rounded-xl border-2 border-sun-deep bg-sun-wash px-4 py-3 font-bold text-sun-deep">
           {error}
         </p>
       )}
       {note && (
-        <p role="status" className="rounded-xl bg-sky px-3 py-2 font-medium text-sea-deep">
+        <p role="status" className="rounded-xl border-2 border-sea bg-sky px-4 py-3 font-bold text-sea-deep">
           {note}
         </p>
       )}
@@ -105,7 +105,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" ? "Create account" : "Sign in"}
       </Button>
       {mode === "login" && FIREBASE_ENABLED && (
-        <button type="button" onClick={forgot} className="self-center text-sm font-semibold text-sea-deep underline">
+        <button type="button" onClick={forgot} className="min-h-12 self-center px-2 text-lg font-bold text-sea-deep underline underline-offset-4">
           Forgot password?
         </button>
       )}
@@ -113,14 +113,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" ? (
           <>
             Already have an account?{" "}
-            <Link className="font-semibold text-sea-deep underline" href="/login">
+            <Link className="font-bold text-sea-deep underline underline-offset-4" href="/login">
               Sign in
             </Link>
           </>
         ) : (
           <>
             New to Waymax?{" "}
-            <Link className="font-semibold text-sea-deep underline" href="/signup">
+            <Link className="font-bold text-sea-deep underline underline-offset-4" href="/signup">
               Create an account
             </Link>
           </>

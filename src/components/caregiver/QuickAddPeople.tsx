@@ -12,7 +12,7 @@ import { usePhotoEnrollment } from "./usePhotoEnrollment";
 function EnrollRow({ person, onChange }: { person: PersonSummary; onChange: () => void }) {
   const enrollment = usePhotoEnrollment(person.id);
   return (
-    <li className="flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-white p-3">
+    <li className="flex flex-wrap items-center gap-4 rounded-2xl border-2 border-line bg-white p-3">
       <Avatar url={person.photoUrl} name={person.name} className="h-14 w-14" />
       <div className="flex-1">
         <p className="font-semibold">

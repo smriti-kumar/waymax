@@ -16,7 +16,7 @@ function ChartTooltip({ active, payload }: { active?: boolean; payload?: { paylo
   if (!active || !payload?.length) return null;
   const p = payload[0]!.payload;
   return (
-    <div className="rounded-lg border border-line bg-white px-3 py-2 text-sm shadow-md">
+    <div className="rounded-lg border-2 border-ink bg-white px-4 py-2 text-base">
       <p className="text-ink-soft">{label(p.day, { weekday: "short", month: "short", day: "numeric" })}</p>
       <p className="font-semibold text-ink">
         {p.n} {p.n === 1 ? "press" : "presses"}
@@ -33,36 +33,36 @@ export function ConfusionChart({ daily }: { daily: Point[] }) {
       <div className="h-56 w-full" role="img" aria-label={`Daily presses over ${daily.length} days, most recent ${daily.at(-1)?.n ?? 0} today`}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={daily} margin={{ top: 8, right: 8, left: -16, bottom: 0 }} barCategoryGap={2}>
-            <CartesianGrid vertical={false} stroke="#ece4d6" />
+            <CartesianGrid vertical={false} stroke="#d9ccb8" />
             <XAxis
               dataKey="day"
               tickFormatter={(d: string) => label(d, { month: "numeric", day: "numeric" })}
-              tick={{ fill: "#5c4a3a", fontSize: 12 }}
-              axisLine={{ stroke: "#e2d5c1" }}
+              tick={{ fill: "#1d1712", fontSize: 16 }}
+              axisLine={{ stroke: "#7a6650" }}
               tickLine={false}
               interval="preserveStartEnd"
-              minTickGap={12}
+              minTickGap={20}
             />
-            <YAxis allowDecimals={false} domain={[0, max]} tick={{ fill: "#5c4a3a", fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
+            <YAxis allowDecimals={false} domain={[0, max]} tick={{ fill: "#1d1712", fontSize: 16 }} axisLine={false} tickLine={false} width={44} />
             <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(0,138,160,0.08)" }} />
             <Bar dataKey="n" fill={BAR} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <details className="mt-2 text-sm text-ink-soft">
-        <summary className="cursor-pointer">Show as a table</summary>
-        <table className="mt-2 w-full max-w-sm text-left">
+      <details className="mt-4 text-ink">
+        <summary className="inline-flex min-h-12 cursor-pointer items-center rounded-xl border-2 border-line bg-white px-4 font-bold hover:bg-sand">Show as a table</summary>
+        <table className="mt-3 w-full max-w-sm text-left">
           <thead>
             <tr>
-              <th className="py-1 font-semibold">Day</th>
-              <th className="py-1 font-semibold">Presses</th>
+              <th className="border-b-2 border-line py-2 font-bold">Day</th>
+              <th className="border-b-2 border-line py-2 font-bold">Presses</th>
             </tr>
           </thead>
           <tbody>
             {[...daily].reverse().map((d) => (
               <tr key={d.day}>
-                <td className="py-0.5">{label(d.day, { weekday: "short", month: "short", day: "numeric" })}</td>
-                <td className="py-0.5">{d.n}</td>
+                <td className="py-1">{label(d.day, { weekday: "short", month: "short", day: "numeric" })}</td>
+                <td className="py-1">{d.n}</td>
               </tr>
             ))}
           </tbody>

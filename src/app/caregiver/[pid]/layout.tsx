@@ -22,16 +22,16 @@ export default async function PatientLayout({ children, params }: LayoutProps<"/
   const { caregiver } = await caregiverForPatientOrRedirect(pid);
   const [patient, all] = await Promise.all([getPatient(pid), patientsForCaregiver(caregiver.id)]);
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold">{patient.preferredName}</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-ink-soft">{patient.name}</span>
-          <PatientSwitcher current={pid} patients={all} />
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold">{patient.preferredName}</h1>
+          <p className="text-ink-soft">{patient.name}</p>
         </div>
+        <PatientSwitcher current={pid} patients={all} />
       </div>
       <PatientNav pid={pid} items={NAV} />
-      <div className="flex flex-col gap-6">{children}</div>
+      <div className="flex flex-col gap-8">{children}</div>
     </div>
   );
 }

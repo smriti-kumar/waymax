@@ -115,10 +115,10 @@ export function Slideshow({ personId, slideMs = 8000 }: { personId: string; slid
               {data.name[0]}
             </div>
           )}
-          <p className="max-w-[30ch] text-center text-[40px] font-semibold leading-snug text-white" aria-live="polite" data-testid="slide-caption">
+          <p className="max-w-[30ch] text-center text-[40px] font-bold leading-normal text-white" aria-live="polite" data-testid="slide-caption">
             {finished && data.outro ? data.outro : slide.caption}
           </p>
-          {paused && <p className="absolute right-10 top-6 rounded-full bg-white px-6 py-2 text-[28px] font-bold text-ink">Paused</p>}
+          {paused && <p className="absolute right-10 top-6 rounded-full border-4 border-ink bg-white px-6 py-2 text-[28px] font-bold text-ink">Paused</p>}
         </section>
       )}
     </PatientFrame>

@@ -154,7 +154,7 @@ export function CalmingFlow({ timezone, homeLabel }: { timezone: string; homeLab
               <button
                 data-testid="play-music"
                 onClick={playMusic}
-                className="min-h-[200px] min-w-[360px] rounded-[40px] bg-sea px-10 text-[40px] font-bold text-white shadow-md hover:bg-sea-deep"
+                className="min-h-[200px] min-w-[360px] rounded-[40px] border-4 border-sea-deep bg-sea px-10 text-[40px] font-bold text-white hover:bg-sea-deep"
               >
                 Play soothing music
               </button>
@@ -164,7 +164,7 @@ export function CalmingFlow({ timezone, homeLabel }: { timezone: string; homeLab
                   logPatientEvent("calming_memories");
                   router.push("/patient/memories");
                 }}
-                className="min-h-[200px] min-w-[360px] rounded-[40px] bg-sun px-10 text-[40px] font-bold text-ink shadow-md hover:bg-[#dc9228]"
+                className="min-h-[200px] min-w-[360px] rounded-[40px] border-4 border-sun-deep bg-sun px-10 text-[40px] font-bold text-ink hover:bg-sun-hover"
               >
                 Look at memories
               </button>

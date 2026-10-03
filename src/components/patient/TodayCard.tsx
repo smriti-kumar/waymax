@@ -17,7 +17,7 @@ const PLAN_ROW = 56;
 const ROW_GAP = 12;
 
 const arrowCls =
-  "min-h-[64px] rounded-2xl border-4 border-sea bg-white px-5 text-[24px] font-bold text-sea-deep hover:bg-sky disabled:opacity-40";
+  "min-h-[64px] rounded-2xl border-4 border-sea bg-white px-5 text-[24px] font-bold text-sea-deep hover:bg-sky disabled:border-line disabled:text-ink-soft disabled:opacity-60";
 
 /**
  * The idle screen. Sizes scale with the window height and each list shows only
@@ -59,19 +59,19 @@ export function TodayCard({ today, timezone, preferredName }: { today: TodayResp
       </header>
 
       {!!today?.specialToday?.length && (
-        <p className="flex-none rounded-3xl bg-[#fdf0d8] px-8 py-[1.2vh] text-[clamp(28px,4.2vh,36px)] font-bold text-ink" data-testid="today-special">
+        <p className="flex-none rounded-3xl border-4 border-sun bg-sun-wash px-8 py-[1.2vh] text-[clamp(28px,4.2vh,36px)] font-bold text-ink" data-testid="today-special">
           {today.specialToday.join(" ")}
         </p>
       )}
 
       {today?.nextText && (
-        <p className="flex-none rounded-3xl bg-sea px-8 py-[1.6vh] text-[clamp(30px,4.8vh,40px)] font-bold text-white" data-testid="today-next">
+        <p className="flex-none rounded-3xl border-4 border-sea-deep bg-sea px-8 py-[1.6vh] text-[clamp(30px,4.8vh,40px)] font-bold text-white" data-testid="today-next">
           {today.nextText}
         </p>
       )}
 
       <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-6 lg:grid-cols-[1fr_1.3fr] lg:grid-rows-[minmax(0,1fr)]">
-        <div className="flex min-h-0 flex-col gap-3 overflow-hidden rounded-3xl bg-white p-6 shadow-sm">
+        <div className="flex min-h-0 flex-col gap-3 overflow-hidden rounded-3xl border-4 border-line bg-white p-6">
           <h2 className="flex-none text-[clamp(32px,5.4vh,48px)] font-bold leading-tight">Visitors today</h2>
           {(today?.visitorsToday.length ?? 0) === 0 ? (
             <p className="text-ink-soft">No visitors planned today.</p>
@@ -99,7 +99,7 @@ export function TodayCard({ today, timezone, preferredName }: { today: TodayResp
           )}
         </div>
 
-        <div className="flex min-h-0 flex-col gap-3 overflow-hidden rounded-3xl bg-white p-6 shadow-sm">
+        <div className="flex min-h-0 flex-col gap-3 overflow-hidden rounded-3xl border-4 border-line bg-white p-6">
           <div className="flex flex-none flex-wrap items-center justify-between gap-3">
             <h2 className="text-[clamp(32px,5.4vh,48px)] font-bold leading-tight" data-testid="plan-title">
               {planTitle}
@@ -123,8 +123,8 @@ export function TodayCard({ today, timezone, preferredName }: { today: TodayResp
                   key={i.id + i.startsAt}
                   className={cx(
                     "flex h-[56px] flex-none items-center gap-5 rounded-2xl px-4",
-                    showingToday && i.status === "now" && "bg-sky font-bold",
-                    showingToday && i.status === "next" && "bg-[#fdf0d8]",
+                    showingToday && i.status === "now" && "bg-sky font-bold outline-4 -outline-offset-4 outline-sea",
+                    showingToday && i.status === "next" && "bg-sun-wash",
                   )}
                 >
                   <span className="w-[150px] flex-none text-ink-soft">{i.timeText}</span>

@@ -4,7 +4,7 @@ import { api, ApiClientError } from "@/client/api";
 import { MONTHS, formatMonthDay } from "@/lib/dates";
 import type { PersonDateDto } from "@/lib/contracts/dates";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Select } from "@/components/ui/Field";
+import { Choices, Field, Input } from "@/components/ui/Field";
 
 const KIND_LABEL = { birthday: "Birthday", anniversary: "Anniversary", other: "Other" } as const;
 
@@ -45,9 +45,9 @@ export function DatesEditor({ personId, dates, onChange }: { personId: string; d
       {dates.length > 0 ? (
         <ul className="flex flex-col gap-2">
           {dates.map((d) => (
-            <li key={d.id} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-2">
+            <li key={d.id} className="flex items-center justify-between gap-3 rounded-xl border-2 border-line bg-white px-4 py-3">
               <span>
-                <span className="font-semibold">{d.label ?? KIND_LABEL[d.kind]}</span>{" "}
+                <span className="font-bold">{d.label ?? KIND_LABEL[d.kind]}</span>{" "}
                 <span className="text-ink-soft">
                   · {formatMonthDay(d)}
                   {d.year ? `, ${d.year}` : ""}
@@ -69,36 +69,35 @@ export function DatesEditor({ personId, dates, onChange }: { personId: string; d
       ) : (
         <p className="text-ink-soft">No dates yet. On the day, the patient&apos;s screen gently mentions it.</p>
       )}
-      <form onSubmit={add} className="grid items-end gap-3 rounded-2xl border border-line bg-cream p-4 sm:grid-cols-[auto_1fr_auto_auto_auto_auto]">
-        <Field label="Kind">
-          <Select value={kind} onChange={(e) => setKind(e.target.value as PersonDateDto["kind"])}>
-            <option value="birthday">Birthday</option>
-            <option value="anniversary">Anniversary</option>
-            <option value="other">Other</option>
-          </Select>
-        </Field>
+      <form onSubmit={add} className="flex flex-col gap-5 rounded-2xl border-2 border-line bg-cream p-5">
+        <Choices
+          label="Kind"
+          name="kind"
+          value={kind}
+          onChange={(v) => setKind(v as PersonDateDto["kind"])}
+          options={Object.entries(KIND_LABEL).map(([value, label]) => ({ value, label }))}
+        />
         <Field label={kind === "birthday" ? "Label (optional)" : "What is it?"}>
           <Input name="label" maxLength={120} required={kind === "other"} placeholder={kind === "anniversary" ? "Raj and Anita's wedding anniversary" : ""} />
         </Field>
-        <Field label="Month">
-          <Select name="month" defaultValue="1">
-            {MONTHS.map((m, i) => (
-              <option key={m} value={i + 1}>
-                {m}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label="Day">
-          <Input name="day" type="number" min={1} max={31} required className="w-20" />
-        </Field>
-        <Field label="Year (optional)">
-          <Input name="year" type="number" min={1900} max={2100} className="w-28" />
-        </Field>
-        <Button type="submit" loading={busy}>
-          Add date
-        </Button>
-        {error && <p className="font-medium text-sun-deep sm:col-span-6">{error}</p>}
+        <Choices
+          label="Month"
+          name="month"
+          defaultValue="1"
+          options={MONTHS.map((m, i) => ({ value: String(i + 1), label: m.slice(0, 3) }))}
+        />
+        <div className="flex flex-wrap items-end gap-4">
+          <Field label="Day">
+            <Input name="day" type="number" min={1} max={31} required className="w-28" />
+          </Field>
+          <Field label="Year (optional)">
+            <Input name="year" type="number" min={1900} max={2100} className="w-36" />
+          </Field>
+          <Button type="submit" loading={busy}>
+            Add date
+          </Button>
+        </div>
+        {error && <p className="font-bold text-sun-deep">{error}</p>}
       </form>
     </div>
   );

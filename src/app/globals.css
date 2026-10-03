@@ -1,19 +1,55 @@
 @import "tailwindcss";
 
-/* Waymax palette: warm, high contrast, never red. */
+/*
+ * Waymax palette: warm, high contrast (body text ≥ 7:1, WCAG AAA), never red.
+ * Borders (`line`) are ≥ 4:1 so every card, field and button edge is easy to see.
+ */
 @theme {
   --color-cream: #fbf6ee;
   --color-sand: #f1e6d4;
-  --color-ink: #2b2118;
-  --color-ink-soft: #5c4a3a;
+  --color-ink: #1d1712;
+  --color-ink-soft: #4a3a2c;
   --color-sun: #e9a23b;
-  --color-sun-deep: #b8731a;
-  --color-sea: #2f6f73;
-  --color-sea-deep: #1f4f52;
-  --color-leaf: #4f7a3a;
+  --color-sun-hover: #dc9228;
+  --color-sun-deep: #7a4a0c;
+  --color-sun-wash: #fdf0d8;
+  --color-sea: #1b5e63;
+  --color-sea-deep: #123f42;
+  --color-leaf: #2f5521;
+  --color-leaf-deep: #223f18;
+  --color-leaf-wash: #e4efdc;
   --color-sky: #dfeef0;
-  --color-line: #e2d5c1;
-  --font-sans: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-line: #7a6650;
+
+  /*
+   * Type scale for older readers: nothing below 18px, body 20px, and roomy
+   * 1.7 line spacing (160–180%). Headings (2xl and up) stay tighter so
+   * multi-line titles still read as one unit.
+   */
+  --text-xs: 1.125rem;
+  --text-xs--line-height: 1.7;
+  --text-sm: 1.125rem;
+  --text-sm--line-height: 1.7;
+  --text-base: 1.25rem;
+  --text-base--line-height: 1.7;
+  --text-lg: 1.375rem;
+  --text-lg--line-height: 1.65;
+  --text-xl: 1.625rem;
+  --text-xl--line-height: 1.5;
+  --text-2xl: 1.875rem;
+  --text-2xl--line-height: 1.35;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 1.3;
+  --text-4xl: 2.75rem;
+  --text-4xl--line-height: 1.25;
+  --text-5xl: 3.25rem;
+  --text-5xl--line-height: 1.2;
+  --text-6xl: 4rem;
+  --text-6xl--line-height: 1.15;
+}
+
+@theme inline {
+  --font-sans: var(--font-legible), "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 html,
@@ -24,11 +60,29 @@ body {
 
 body {
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.7;
 }
 
+/* Links read as links: always underlined unless styled as a button. */
+a:not([class]) {
+  color: var(--color-sea-deep);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+}
+
+/* A thick, dark ring that shows on every surface, including the teal buttons. */
 :focus-visible {
-  outline: 3px solid var(--color-sea);
+  outline: 4px solid var(--color-ink);
   outline-offset: 3px;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+::placeholder {
+  color: var(--color-ink-soft);
+  opacity: 0.85;
 }
 
 @keyframes wm-pulse {

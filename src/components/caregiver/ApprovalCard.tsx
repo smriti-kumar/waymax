@@ -4,7 +4,7 @@ import { api, ApiClientError } from "@/client/api";
 import { ago } from "@/client/format";
 import type { PersonSummary } from "@/lib/contracts/people";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Select } from "@/components/ui/Field";
+import { Choices, Field, Input } from "@/components/ui/Field";
 import { RELATIONSHIP_HINTS } from "./PersonForm";
 
 export function ApprovalCard({
@@ -48,16 +48,16 @@ export function ApprovalCard({
   }
 
   return (
-    <li className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-4 sm:flex-row" data-testid="approval-card">
+    <li className="flex flex-col gap-5 rounded-2xl border-2 border-line bg-white p-5 sm:flex-row" data-testid="approval-card">
       {person.photoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={person.photoUrl} alt="Face seen by the patient's camera" className="h-40 w-40 flex-none rounded-2xl object-cover" />
       ) : (
-        <div className="flex h-40 w-40 flex-none items-center justify-center rounded-2xl bg-sand text-ink-soft">No photo</div>
+        <div className="flex h-40 w-40 flex-none items-center justify-center rounded-2xl border-2 border-line bg-sand text-ink-soft">No photo</div>
       )}
-      <div className="flex flex-1 flex-col gap-3">
-        <p className="text-sm text-ink-soft">Seen {ago(person.createdAt)} · added from the patient&apos;s screen</p>
-        <form onSubmit={approve} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+      <div className="flex flex-1 flex-col gap-4">
+        <p className="text-ink-soft">Seen {ago(person.createdAt)} · added from the patient&apos;s screen</p>
+        <form onSubmit={approve} className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
           <Field label="Name">
             <Input name="name" required maxLength={80} placeholder="Who is this?" />
           </Field>
@@ -73,19 +73,17 @@ export function ApprovalCard({
             Approve
           </Button>
         </form>
-        <div className="flex flex-wrap items-end gap-3 border-t border-line pt-3">
+        <div className="flex flex-wrap items-end gap-3 border-t-2 border-line pt-4">
           {existing.length > 0 && (
             <>
-              <Field label="Or it's someone already added">
-                <Select value={mergeTarget} onChange={(e) => setMergeTarget(e.target.value)} aria-label="Merge into">
-                  <option value="">Choose a person…</option>
-                  {existing.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.relationship})
-                    </option>
-                  ))}
-                </Select>
-              </Field>
+              <Choices
+                className="w-full"
+                label="Or it's someone already added"
+                name={`merge-${person.id}`}
+                value={mergeTarget}
+                onChange={setMergeTarget}
+                options={existing.map((p) => ({ value: p.id, label: `${p.name} (${p.relationship})` }))}
+              />
               <Button
                 variant="secondary"
                 disabled={!mergeTarget}
@@ -98,7 +96,7 @@ export function ApprovalCard({
                   )
                 }
               >
-                Merge
+                Same person, add photo
               </Button>
             </>
           )}
@@ -112,7 +110,7 @@ export function ApprovalCard({
             Reject
           </Button>
         </div>
-        {error && <p className="font-medium text-sun-deep">{error}</p>}
+        {error && <p className="font-bold text-sun-deep">{error}</p>}
       </div>
     </li>
   );

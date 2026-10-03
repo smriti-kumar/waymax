@@ -2,9 +2,9 @@
 import { useState, type FormEvent } from "react";
 import useSWR from "swr";
 import { api, ApiClientError, fetcher } from "@/client/api";
-import { TIMEZONES } from "@/lib/timezones";
+import { TIMEZONES, timezoneChoices } from "@/lib/timezones";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Select } from "@/components/ui/Field";
+import { Choices, Field, Input } from "@/components/ui/Field";
 import { Skeleton } from "@/components/ui/Spinner";
 
 type P = { patient: { name: string; preferredName: string; timezone: string; homeLabel: string } };
@@ -42,23 +42,21 @@ export function AboutPatientForm({ pid, onSaved }: { pid: string; onSaved: () =>
       <Field label="What they like to be called" hint="Used on every patient screen and spoken aloud">
         <Input name="preferredName" required defaultValue={p.preferredName} maxLength={60} />
       </Field>
-      <Field label="Time zone">
-        <Select name="timezone" defaultValue={p.timezone}>
-          {(TIMEZONES.includes(p.timezone) ? TIMEZONES : [p.timezone, ...TIMEZONES]).map((tz) => (
-            <option key={tz} value={tz}>
-              {tz.replace(/_/g, " ")}
-            </option>
-          ))}
-        </Select>
-      </Field>
       <Field label="What they call home" hint='Shown as "You are at …"'>
         <Input name="homeLabel" required defaultValue={p.homeLabel} maxLength={60} />
       </Field>
+      <Choices
+        className="sm:col-span-2"
+        label="Time zone"
+        name="timezone"
+        options={timezoneChoices(TIMEZONES.includes(p.timezone) ? TIMEZONES : [p.timezone, ...TIMEZONES])}
+        defaultValue={p.timezone}
+      />
       <div className="flex items-center gap-3 sm:col-span-2">
-        <Button type="submit" loading={busy}>
+        <Button type="submit" size="lg" loading={busy}>
           Save and continue
         </Button>
-        {error && <p className="font-medium text-sun-deep">{error}</p>}
+        {error && <p className="font-bold text-sun-deep">{error}</p>}
       </div>
     </form>
   );

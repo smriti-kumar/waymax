@@ -7,6 +7,7 @@ import { cx } from "@/components/ui/cx";
 
 export type NavItem = { href: string; label: string; badge?: "pending" };
 
+/** Every section is always visible as a large button: no hidden overflow, no menus. */
 export function PatientNav({ pid, items }: { pid: string; items: NavItem[] }) {
   const path = usePathname();
   const { data } = useSWR<{ people: unknown[] }>(`/api/patients/${pid}/people?status=pending`, fetcher, {
@@ -14,8 +15,8 @@ export function PatientNav({ pid, items }: { pid: string; items: NavItem[] }) {
   });
   const pending = data?.people.length ?? 0;
   return (
-    <nav aria-label="Patient sections" className="-mx-4 overflow-x-auto px-4">
-      <ul className="flex gap-1 whitespace-nowrap">
+    <nav aria-label="Patient sections">
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {items.map((it) => {
           const href = `/caregiver/${pid}${it.href}`;
           const active = it.href === "" ? path === href : path.startsWith(href);
@@ -25,13 +26,16 @@ export function PatientNav({ pid, items }: { pid: string; items: NavItem[] }) {
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cx(
-                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold",
-                  active ? "bg-sea text-white" : "text-ink-soft hover:bg-sand",
+                  "flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 px-3 py-2 text-center text-lg font-bold",
+                  active ? "border-sea-deep bg-sea text-white" : "border-line bg-white text-ink hover:bg-sand",
                 )}
               >
                 {it.label}
                 {it.badge === "pending" && pending > 0 && (
-                  <span data-testid="pending-badge" className="rounded-full bg-sun px-1.5 text-xs font-bold text-ink">
+                  <span
+                    data-testid="pending-badge"
+                    className="inline-flex min-w-8 items-center justify-center rounded-full border-2 border-ink bg-sun px-2 text-base font-bold text-ink"
+                  >
                     {pending}
                   </span>
                 )}

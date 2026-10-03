@@ -13,7 +13,7 @@ export default async function PairPage() {
       {d && (
         <div className="w-full rounded-3xl bg-sky p-5 text-[24px]">
           This device is already set up for {d.patient.preferredName}.{" "}
-          <Link className="font-bold text-sea-deep underline" href={d.device.kind === "patient_phone" ? "/phone" : "/patient"}>
+          <Link className="font-bold text-sea-deep underline underline-offset-4" href={d.device.kind === "patient_phone" ? "/phone" : "/patient"}>
             Continue
           </Link>
         </div>

@@ -43,7 +43,7 @@ export function QuestionsScreen() {
       >
         <section className="flex h-full flex-col justify-center gap-8 px-12" aria-live="polite">
           <p className="text-[36px] text-ink-soft">{open.question}</p>
-          <p className="text-[56px] font-bold leading-snug" data-testid="question-answer">
+          <p className="text-[56px] font-bold leading-normal" data-testid="question-answer">
             {open.answer}
           </p>
         </section>
@@ -74,7 +74,7 @@ export function QuestionsScreen() {
               <button
                 key={q.id}
                 onClick={() => ask(q)}
-                className="min-h-[96px] rounded-3xl bg-sea px-10 text-left text-[40px] font-bold text-white shadow-sm hover:bg-sea-deep"
+                className="min-h-[96px] rounded-3xl border-4 border-sea-deep bg-sea px-10 py-3 text-left text-[40px] font-bold leading-snug text-white hover:bg-sea-deep"
               >
                 {q.question}
               </button>

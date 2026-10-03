@@ -47,7 +47,7 @@ export function PeopleList({ pid }: { pid: string }) {
               <li key={p.id}>
                 <Link
                   href={`/caregiver/${pid}/people/${p.id}`}
-                  className="flex items-center gap-4 rounded-2xl border border-line bg-white p-3 hover:border-sea"
+                  className="flex items-center gap-4 rounded-2xl border-2 border-line bg-white p-3 hover:border-sea"
                 >
                   <Avatar url={p.photoUrl} name={p.name} className="h-16 w-16 text-xl" />
                   <span className="flex flex-col">

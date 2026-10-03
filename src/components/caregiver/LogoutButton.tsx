@@ -5,7 +5,7 @@ import { FIREBASE_ENABLED, firebaseAuth } from "@/client/firebase";
 export function LogoutButton() {
   return (
     <button
-      className="rounded-lg px-3 py-1.5 text-sm font-semibold text-ink-soft hover:bg-sand"
+      className="min-h-12 rounded-xl border-2 border-line bg-white px-4 text-lg font-bold text-ink hover:bg-sand"
       onClick={async () => {
         await api("/api/auth/logout", { method: "POST" }).catch(() => {});
         if (FIREBASE_ENABLED) await firebaseAuth().signOut().catch(() => {});

@@ -26,7 +26,7 @@ export function PatientFrame({
     <div className={cx("flex h-dvh flex-col overflow-hidden bg-cream text-[28px] text-ink", className)}>
       {/* Content is clipped and sits below the action bar, so it can never cover a button. */}
       <div className="relative z-0 flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
-      <nav aria-label="Actions" className="relative z-20 flex flex-none items-stretch gap-4 border-t-2 border-line bg-sand px-6 py-4">
+      <nav aria-label="Actions" className="relative z-20 flex flex-none items-stretch gap-4 border-t-4 border-line bg-sand px-6 py-4">
         <div className="flex flex-1 flex-wrap gap-4">{buttons}</div>
         {!hideConfused && <ConfusedButton onPress={onConfused} />}
       </nav>
@@ -46,7 +46,7 @@ export function ConfusedButton({ onPress }: { onPress?: () => void }) {
           onPress();
         }
       }}
-      className="flex min-h-[72px] flex-none items-center rounded-3xl bg-sun px-8 text-[28px] font-bold text-ink shadow-sm hover:bg-[#dc9228] active:scale-[0.98]"
+      className="flex min-h-[72px] flex-none items-center rounded-3xl border-4 border-sun-deep bg-sun px-8 text-[28px] font-bold text-ink hover:bg-sun-hover active:scale-[0.98]"
     >
       I feel confused
     </Link>
@@ -58,8 +58,8 @@ export function PatientLinkButton({ href, children, tone = "light" }: { href: st
     <Link
       href={href}
       className={cx(
-        "flex min-h-[72px] items-center rounded-3xl px-8 text-[28px] font-bold shadow-sm active:scale-[0.98]",
-        tone === "sea" ? "bg-sea text-white hover:bg-sea-deep" : "border-4 border-sea bg-white text-sea-deep hover:bg-sky",
+        "flex min-h-[72px] items-center rounded-3xl px-8 text-[28px] font-bold active:scale-[0.98]",
+        tone === "sea" ? "border-4 border-sea-deep bg-sea text-white hover:bg-sea-deep" : "border-4 border-sea bg-white text-sea-deep hover:bg-sky",
       )}
     >
       {children}

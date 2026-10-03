@@ -72,18 +72,18 @@ export function PhoneSharing({ preferredName, caregiverName }: { preferredName: 
             </li>
             <li>Come back here and reload the page.</li>
           </ol>
-          <button onClick={() => location.reload()} className="min-h-[72px] rounded-3xl bg-sea px-10 text-[28px] font-bold text-white">
+          <button onClick={() => location.reload()} className="min-h-[72px] rounded-3xl border-4 border-sea-deep bg-sea px-10 text-[28px] font-bold text-white">
             Try again
           </button>
         </>
       ) : (
         <>
-          <div className={"h-24 w-24 rounded-full " + (status === "sharing" ? "wm-pulse bg-leaf" : "bg-sand")} aria-hidden />
+          <div className={"h-24 w-24 rounded-full " + (status === "sharing" ? "wm-pulse bg-leaf" : "border-4 border-line bg-sand")} aria-hidden />
           <h1 className="text-[36px] font-bold leading-tight" data-testid="phone-status">
             {status === "sharing" ? `Sharing location with ${caregiverName}` : status === "starting" ? "Starting…" : "Looking for your location…"}
           </h1>
           <p className="text-[24px]">Hello, {preferredName}.</p>
-          <p className="max-w-md rounded-3xl bg-sky px-6 py-4 text-[22px] font-semibold text-sea-deep">Keep this page open.</p>
+          <p className="max-w-md rounded-3xl border-4 border-sea bg-sky px-6 py-4 text-[24px] font-bold text-sea-deep">Keep this page open.</p>
           <p className="text-lg text-ink-soft">
             {secondsAgo !== null ? `Last update ${secondsAgo < 10 ? "just now" : `${secondsAgo} seconds ago`}` : " "}
           </p>

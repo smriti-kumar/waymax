@@ -7,17 +7,17 @@ import type { PersonSummary } from "@/lib/contracts/people";
 import { Button } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { EmptyState, ErrorState } from "@/components/ui/EmptyState";
-import { Field, Input, Select } from "@/components/ui/Field";
+import { Choices, Field, Input } from "@/components/ui/Field";
 import { Skeleton } from "@/components/ui/Spinner";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const KINDS = [
-  ["visit", "Visit"],
-  ["activity", "Activity"],
-  ["meal", "Meal"],
-  ["therapy", "Therapy"],
-  ["other", "Other"],
-] as const;
+  { value: "visit", label: "Visit" },
+  { value: "activity", label: "Activity" },
+  { value: "meal", label: "Meal" },
+  { value: "therapy", label: "Therapy" },
+  { value: "other", label: "Other" },
+];
 
 function describe(i: ScheduleItemDto) {
   if (i.daysOfWeek && i.startTime) {
@@ -77,34 +77,20 @@ function ItemForm({
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-4 rounded-2xl border border-line bg-cream p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="flex flex-col gap-6 rounded-2xl border-2 border-line bg-cream p-5">
       <Field label="What">
         <Input name="title" required maxLength={120} defaultValue={initial?.title} placeholder="Lunch" />
       </Field>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Kind">
-          <Select name="kind" defaultValue={initial?.kind ?? "activity"}>
-            {KINDS.map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label="With (optional)">
-          <Select name="personId" defaultValue={initial?.personId ?? ""}>
-            <option value="">No one</option>
-            {people.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </div>
-      <fieldset className="flex flex-col gap-2 sm:col-span-2">
-        <legend className="text-sm font-semibold">When</legend>
-        <div className="flex gap-2">
+      <Choices label="Kind" name="kind" defaultValue={initial?.kind ?? "activity"} options={KINDS} />
+      <Choices
+        label="With (optional)"
+        name="personId"
+        defaultValue={initial?.personId ?? ""}
+        options={[{ value: "", label: "No one" }, ...people.map((p) => ({ value: p.id, label: p.name ?? "Someone" }))]}
+      />
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-2 text-lg font-bold">When</legend>
+        <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" variant={weekly ? "primary" : "secondary"} onClick={() => setWeekly(true)}>
             Every week
           </Button>
@@ -113,8 +99,8 @@ function ItemForm({
           </Button>
         </div>
         {weekly ? (
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex flex-wrap gap-1" role="group" aria-label="Days of the week">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Days of the week">
               {DAYS.map((d, i) => (
                 <button
                   type="button"
@@ -122,10 +108,11 @@ function ItemForm({
                   aria-pressed={days.includes(i)}
                   onClick={() => setDays((cur) => (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i].sort()))}
                   className={
-                    "rounded-lg px-3 py-2 text-sm font-semibold " +
-                    (days.includes(i) ? "bg-sea text-white" : "border border-line bg-white text-ink-soft")
+                    "min-h-12 min-w-16 rounded-xl border-2 px-3 py-2 text-lg font-bold " +
+                    (days.includes(i) ? "border-sea-deep bg-sea text-white" : "border-line bg-white text-ink hover:bg-sand")
                   }
                 >
+                  {days.includes(i) && <span aria-hidden>✓ </span>}
                   {d}
                 </button>
               ))}
@@ -145,13 +132,15 @@ function ItemForm({
           </Field>
         )}
       </fieldset>
-      <Field label="Minutes">
-        <Input name="durationMin" type="number" min={5} max={720} defaultValue={initial?.durationMin ?? 60} />
-      </Field>
-      <Field label="Notes (optional)">
-        <Input name="notes" maxLength={500} defaultValue={initial?.notes ?? ""} />
-      </Field>
-      <div className="flex items-center gap-2 sm:col-span-2">
+      <div className="grid gap-4 sm:grid-cols-[12rem_1fr]">
+        <Field label="Minutes">
+          <Input name="durationMin" type="number" min={5} max={720} defaultValue={initial?.durationMin ?? 60} />
+        </Field>
+        <Field label="Notes (optional)">
+          <Input name="notes" maxLength={500} defaultValue={initial?.notes ?? ""} />
+        </Field>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" loading={busy}>
           {initial ? "Save" : "Add to schedule"}
         </Button>
@@ -160,7 +149,7 @@ function ItemForm({
             Cancel
           </Button>
         )}
-        {error && <p className="font-medium text-sun-deep">{error}</p>}
+        {error && <p className="font-bold text-sun-deep">{error}</p>}
       </div>
     </form>
   );
@@ -184,7 +173,7 @@ export function ScheduleEditor({ pid }: { pid: string }) {
         ) : !data?.items.length ? (
           <EmptyState title="Nothing scheduled" body="Add meals, visits and activities. They show on the patient's Today card." />
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-3">
             {data.items.map((i) =>
               editing === i.id ? (
                 <li key={i.id}>
@@ -200,17 +189,17 @@ export function ScheduleEditor({ pid }: { pid: string }) {
                   />
                 </li>
               ) : (
-                <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-white px-4 py-3">
+                <li key={i.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-line bg-white px-5 py-4">
                   <div>
-                    <p className="font-semibold">
+                    <p className="text-lg font-bold">
                       {i.title}
                       {i.personName ? ` · with ${i.personName}` : ""}
                     </p>
-                    <p className="text-sm text-ink-soft">
+                    <p className="text-ink-soft">
                       {describe(i)} · {i.durationMin} min · {i.kind}
                     </p>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-2">
                     <Button size="sm" variant="ghost" onClick={() => setEditing(i.id)}>
                       Edit
                     </Button>

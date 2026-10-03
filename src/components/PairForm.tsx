@@ -48,7 +48,7 @@ export function PairForm() {
         autoFocus
         value={code}
         onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-        className="w-full max-w-sm rounded-3xl border-4 border-sea bg-white px-4 py-5 text-center font-mono text-6xl tracking-[0.3em] text-ink focus:outline-none"
+        className="w-full max-w-sm rounded-3xl border-4 border-sea bg-white px-4 py-5 text-center font-mono text-6xl tracking-[0.3em] text-ink focus:border-sea-deep"
         aria-describedby={error ? "pair-error" : undefined}
       />
       {error && (
@@ -59,7 +59,7 @@ export function PairForm() {
       <button
         type="submit"
         disabled={busy}
-        className="min-h-[72px] w-full max-w-sm rounded-3xl bg-sea px-8 text-[28px] font-bold text-white hover:bg-sea-deep disabled:opacity-60"
+        className="min-h-[72px] w-full max-w-sm rounded-3xl border-4 border-sea-deep bg-sea px-8 text-[28px] font-bold text-white hover:bg-sea-deep disabled:opacity-60"
       >
         {busy ? "Connecting…" : "Connect"}
       </button>

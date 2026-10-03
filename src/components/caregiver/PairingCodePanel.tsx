@@ -51,7 +51,7 @@ export function PairingCodePanel({ pid, onPaired }: { pid: string; onPaired?: ()
         const left = c ? Math.max(0, new Date(c.expiresAt).getTime() - now) : 0;
         const live = c && left > 0;
         return (
-          <div key={kind} className="flex flex-col gap-3 rounded-2xl border border-line bg-cream p-4">
+          <div key={kind} className="flex flex-col gap-3 rounded-2xl border-2 border-line bg-cream p-4">
             <p className="font-semibold">{LABEL[kind]}</p>
             {live ? (
               <>
@@ -79,7 +79,7 @@ export function PairingCodePanel({ pid, onPaired }: { pid: string; onPaired?: ()
           </div>
         );
       })}
-      {error && <p className="font-medium text-sun-deep sm:col-span-2">{error}</p>}
+      {error && <p className="font-semibold text-sun-deep sm:col-span-2">{error}</p>}
     </div>
   );
 }

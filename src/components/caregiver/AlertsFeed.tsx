@@ -39,7 +39,7 @@ export function AlertsFeed({ pid, limit = 10 }: { pid: string; limit?: number })
           key={n.id}
           className={
             "flex flex-wrap items-start justify-between gap-2 rounded-xl border px-4 py-3 " +
-            (n.readAt ? "border-line bg-white" : n.kind === "geofence_exit" ? "border-sun bg-[#fff6e6]" : "border-sea/40 bg-sky/50")
+            (n.readAt ? "border-line bg-white" : n.kind === "geofence_exit" ? "border-sun bg-sun-wash" : "border-sea/40 bg-sky/50")
           }
         >
           <div className="min-w-0 flex-1">

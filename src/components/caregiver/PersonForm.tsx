@@ -94,7 +94,7 @@ export function PersonForm({
         </Button>
         {extra?.({ name, relationship, spokenName })}
         {error && (
-          <p role="alert" className="font-medium text-sun-deep">
+          <p role="alert" className="font-semibold text-sun-deep">
             {error}
           </p>
         )}

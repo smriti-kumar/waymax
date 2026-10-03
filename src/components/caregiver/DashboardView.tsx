@@ -4,6 +4,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import { fetcher } from "@/client/api";
 import { ago } from "@/client/format";
+import { Button } from "@/components/ui/Button";
 import { Card, CardTitle } from "@/components/ui/Card";
 import { EmptyState, ErrorState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Spinner";
@@ -71,38 +72,35 @@ export function DashboardView({ pid }: { pid: string }) {
   const visibleFlags = d.flags.filter((f) => !dismissed.ids.includes(f.id));
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-2">
       <div className="md:col-span-2">
         <StatusTile state={d.geofenceState} changedAt={d.geofenceStateChangedAt} label={d.patient.homeLabel} lastAt={d.lastLocation?.recordedAt ?? null} />
       </div>
 
       {visibleFlags.length > 0 && (
-        <Card className="md:col-span-2 border-sun bg-[#fffaf0]" data-testid="flags">
-          <div className="mb-2 flex items-center justify-between gap-2">
+        <Card className="md:col-span-2 border-sun-deep bg-sun-wash" data-testid="flags">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <CardTitle>Needs a look</CardTitle>
-            <button
+            <Button
+              size="sm"
+              variant="ghost"
               onClick={() => dismissed.dismiss(visibleFlags.map((f) => f.id))}
-              className="rounded-lg px-2 py-1 text-sm font-semibold text-ink-soft hover:bg-sand"
               aria-label="Dismiss all"
               data-testid="flags-dismiss-all"
             >
-              Dismiss all ✕
-            </button>
+              Dismiss all
+            </Button>
           </div>
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-3">
             {visibleFlags.map((f) => (
-              <li key={f.id} className="flex items-start justify-between gap-3 text-ink">
+              <li key={f.id} className="flex flex-wrap items-center justify-between gap-3 text-lg text-ink">
                 <span>
                   <span aria-hidden>⚠︎ </span>
                   {f.message}
                 </span>
-                <button
-                  onClick={() => dismissed.dismiss([f.id])}
-                  aria-label={`Dismiss: ${f.message}`}
-                  className="flex-none rounded-lg px-2 text-lg leading-6 text-ink-soft hover:bg-sand"
-                >
-                  ✕
-                </button>
+                <Button size="sm" variant="ghost" onClick={() => dismissed.dismiss([f.id])} aria-label={`Dismiss: ${f.message}`}>
+                  Dismiss
+                </Button>
               </li>
             ))}
           </ul>
@@ -110,12 +108,10 @@ export function DashboardView({ pid }: { pid: string }) {
       )}
 
       <Card>
-        <div className="mb-3 flex items-baseline justify-between">
-          <CardTitle>&quot;I feel confused&quot; presses</CardTitle>
-          <span className="text-sm text-ink-soft">last 14 days</span>
-        </div>
+        <CardTitle>&quot;I feel confused&quot; presses</CardTitle>
+        <p className="mb-3 text-ink-soft">Last 14 days</p>
         <p className="mb-2">
-          <span className="text-4xl font-bold" data-testid="confusion-today">
+          <span className="text-5xl font-bold" data-testid="confusion-today">
             {d.confusionToday}
           </span>{" "}
           <span className="text-ink-soft">today</span>
@@ -130,42 +126,43 @@ export function DashboardView({ pid }: { pid: string }) {
           <EmptyState title="No visitors yet today" body="When someone is recognized on the patient's screen, they appear here." />
         ) : (
           <ul className="flex flex-col gap-3">
-            {d.visitsToday.map((v) => (
+            {d.visitsToday.slice(0, 5).map((v) => (
               <li key={v.id} className="flex items-center gap-3">
-                <Avatar url={v.photoUrl} name={v.name} className="h-12 w-12" />
+                <Avatar url={v.photoUrl} name={v.name} className="h-16 w-16 text-xl" />
                 <span>
-                  <span className="block font-semibold">
+                  <span className="block text-lg font-bold">
                     {v.name} <span className="font-normal text-ink-soft">· {v.relationship}</span>
                   </span>
-                  <span className="text-sm text-ink-soft">
+                  <span className="text-ink-soft">
                     arrived {v.timeText} · about {v.minutes} min
                   </span>
                 </span>
               </li>
             ))}
+            {d.visitsToday.length > 5 && <li className="text-ink-soft">…and {d.visitsToday.length - 5} earlier visits today.</li>}
           </ul>
         )}
       </Card>
 
       <Card>
-        <div className="mb-3 flex items-baseline justify-between">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <CardTitle>Alerts</CardTitle>
-          {d.unreadAlerts > 0 && <span className="rounded-full bg-sun px-2 text-sm font-bold">{d.unreadAlerts} new</span>}
+          {d.unreadAlerts > 0 && <span className="rounded-full border-2 border-ink bg-sun px-3 text-base font-bold">{d.unreadAlerts} new</span>}
         </div>
         <AlertsFeed pid={pid} limit={5} />
       </Card>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
         <Card>
           <CardTitle className="mb-2">Coming up</CardTitle>
           {d.upcomingDates.length === 0 ? (
             <p className="text-ink-soft">No birthdays or anniversaries in the next 30 days. Add them on each person&apos;s page.</p>
           ) : (
-            <ul className="flex flex-col gap-1" data-testid="upcoming-dates">
+            <ul className="flex flex-col gap-2" data-testid="upcoming-dates">
               {d.upcomingDates.map((u) => (
-                <li key={u.id} className="flex justify-between gap-3">
+                <li key={u.id} className="flex flex-wrap justify-between gap-x-3">
                   <span>{u.text}</span>
-                  <span className={u.days === 0 ? "font-semibold text-leaf" : "text-ink-soft"}>
+                  <span className={u.days === 0 ? "font-bold text-leaf" : "text-ink-soft"}>
                     {u.days === 0 ? "today" : u.days === 1 ? "tomorrow" : `${u.dateText} · in ${u.days} days`}
                   </span>
                 </li>
@@ -176,7 +173,10 @@ export function DashboardView({ pid }: { pid: string }) {
         <Card>
           <CardTitle className="mb-2">Waiting for approval</CardTitle>
           {d.pendingPeople > 0 ? (
-            <Link href={`/caregiver/${pid}/approvals`} className="font-semibold text-sea-deep underline">
+            <Link
+              href={`/caregiver/${pid}/approvals`}
+              className="inline-flex min-h-14 items-center rounded-xl border-2 border-sea-deep bg-sea px-5 text-lg font-bold text-white hover:bg-sea-deep"
+            >
               {d.pendingPeople} new {d.pendingPeople === 1 ? "face" : "faces"} to name →
             </Link>
           ) : (
@@ -188,16 +188,16 @@ export function DashboardView({ pid }: { pid: string }) {
           {d.devices.length === 0 ? (
             <p className="text-ink-soft">
               No devices yet.{" "}
-              <Link className="font-semibold text-sea-deep underline" href={`/caregiver/${pid}/safety`}>
+              <Link className="font-bold text-sea-deep underline underline-offset-4" href={`/caregiver/${pid}/safety`}>
                 Pair the laptop and phone
               </Link>
             </p>
           ) : (
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col gap-2">
               {d.devices.map((x) => (
-                <li key={x.id} className="flex justify-between gap-2">
+                <li key={x.id} className="flex flex-wrap justify-between gap-x-3">
                   <span>{x.label}</span>
-                  <span className={x.online ? "font-semibold text-leaf" : "text-ink-soft"}>{x.online ? "● online" : `seen ${ago(x.lastSeenAt)}`}</span>
+                  <span className={x.online ? "font-bold text-leaf" : "text-ink-soft"}>{x.online ? "● online" : `seen ${ago(x.lastSeenAt)}`}</span>
                 </li>
               ))}
             </ul>

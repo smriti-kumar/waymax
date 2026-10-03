@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { api, ApiClientError } from "@/client/api";
 import type { MemoryDto } from "@/lib/contracts/people";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Select, Textarea } from "@/components/ui/Field";
+import { Choices, Field, Input, Textarea } from "@/components/ui/Field";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 type Photo = { mediaId: string; url: string };
@@ -49,22 +49,24 @@ function MemoryForm({
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-3 rounded-2xl border border-line bg-cream p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="grid gap-3 rounded-2xl border-2 border-line bg-cream p-4 sm:grid-cols-2">
       <Field label="Title">
         <Input name="title" required maxLength={120} defaultValue={initial?.title} placeholder="Trip to Niagara Falls" />
       </Field>
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Kind">
-          <Select name="kind" defaultValue={initial?.kind ?? "story"}>
-            <option value="story">Story</option>
-            <option value="note">Note</option>
-            <option value="photo">Photo</option>
-          </Select>
-        </Field>
-        <Field label="When (optional)">
-          <Input name="occurredOn" type="date" defaultValue={initial?.occurredOn ?? ""} />
-        </Field>
-      </div>
+      <Field label="When (optional)">
+        <Input name="occurredOn" type="date" defaultValue={initial?.occurredOn ?? ""} />
+      </Field>
+      <Choices
+        className="sm:col-span-2"
+        label="Kind"
+        name="kind"
+        defaultValue={initial?.kind ?? "story"}
+        options={[
+          { value: "story", label: "Story" },
+          { value: "note", label: "Note" },
+          { value: "photo", label: "Photo" },
+        ]}
+      />
       <div className="sm:col-span-2">
         <Field label="The memory (optional)">
           <Textarea name="body" maxLength={2000} defaultValue={initial?.body ?? ""} placeholder="We took the boat ride and got soaked…" />
@@ -72,7 +74,7 @@ function MemoryForm({
       </div>
       {photos.length > 0 && (
         <fieldset className="sm:col-span-2">
-          <legend className="mb-2 text-sm font-semibold">Photo (optional)</legend>
+          <legend className="mb-2 text-lg font-bold">Photo (optional)</legend>
           <div className="flex flex-wrap gap-2">
             {photos.map((p) => (
               <button
@@ -80,10 +82,10 @@ function MemoryForm({
                 key={p.mediaId}
                 onClick={() => setMediaId(mediaId === p.mediaId ? null : p.mediaId)}
                 aria-pressed={mediaId === p.mediaId}
-                className={"rounded-xl border-4 " + (mediaId === p.mediaId ? "border-sea" : "border-transparent")}
+                className={"rounded-xl border-4 " + (mediaId === p.mediaId ? "border-sea-deep" : "border-line")}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt="" className="h-16 w-16 rounded-lg object-cover" />
+                <img src={p.url} alt="" className="h-24 w-24 rounded-lg object-cover" />
               </button>
             ))}
           </div>
@@ -98,7 +100,7 @@ function MemoryForm({
             Cancel
           </Button>
         )}
-        {error && <p className="self-center font-medium text-sun-deep">{error}</p>}
+        {error && <p className="self-center font-semibold text-sun-deep">{error}</p>}
       </div>
     </form>
   );
@@ -139,22 +141,22 @@ export function MemoriesEditor({
                 />
               </li>
             ) : (
-              <li key={m.id} className="flex gap-3 rounded-2xl border border-line bg-white p-3">
+              <li key={m.id} className="flex gap-3 rounded-2xl border-2 border-line bg-white p-3">
                 {m.photoUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={m.photoUrl} alt="" className="h-20 w-20 flex-none rounded-xl object-cover" />
                 )}
                 <div className="flex flex-1 flex-col gap-1">
-                  <p className="font-semibold">
+                  <p className="text-lg font-bold">
                     {m.title}{" "}
-                    <span className="text-sm font-normal text-ink-soft">
+                    <span className="font-normal text-ink-soft">
                       {m.kind}
                       {m.occurredOn ? ` · ${m.occurredOn}` : ""}
                     </span>
                   </p>
                   {m.body && <p className="text-ink-soft">{m.body}</p>}
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-2">
                   <Button size="sm" variant="ghost" onClick={() => setEditing(m.id)}>
                     Edit
                   </Button>

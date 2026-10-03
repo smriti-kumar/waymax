@@ -44,7 +44,7 @@ export function MemoriesPicker() {
               <Link
                 key={p.personId}
                 href={`/patient/memories/${p.personId}`}
-                className="flex min-h-0 flex-col items-center gap-4 rounded-[40px] bg-white p-6 shadow-sm hover:bg-sky"
+                className="flex min-h-0 flex-col items-center gap-4 rounded-[40px] border-4 border-line bg-white p-6 hover:border-sea hover:bg-sky"
               >
                 {p.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element

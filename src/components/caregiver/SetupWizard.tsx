@@ -52,7 +52,7 @@ export function SetupWizard({ pid }: { pid: string }) {
               onClick={() => setCurrent(i)}
               aria-current={!done && i === idx ? "step" : undefined}
               className={cx(
-                "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold",
+                "flex min-h-12 items-center gap-2 rounded-full border-2 px-4 py-2 text-base font-bold",
                 !done && i === idx ? "border-sea bg-sea text-white" : "border-line bg-white text-ink-soft hover:border-sea",
               )}
             >
@@ -69,7 +69,7 @@ export function SetupWizard({ pid }: { pid: string }) {
           <p className="text-ink-soft">
             The patient&apos;s laptop shows today&apos;s plan and recognizes visitors; their phone shares location. You can change anything later from the tabs above.
           </p>
-          <Link href={`/caregiver/${pid}`} className="rounded-xl bg-sea px-4 py-2.5 font-semibold text-white hover:bg-sea-deep">
+          <Link href={`/caregiver/${pid}`} className="inline-flex min-h-14 items-center rounded-xl border-2 border-sea-deep bg-sea px-6 text-lg font-bold text-white hover:bg-sea-deep">
             Go to the overview
           </Link>
         </Card>
@@ -89,7 +89,7 @@ export function SetupWizard({ pid }: { pid: string }) {
           {step.key === "people" && <QuickAddPeople pid={pid} onChange={() => void mutate()} />}
           {step.key === "schedule" && <ScheduleEditor pid={pid} />}
           {step.key === "questions" && <QuestionsEditor pid={pid} />}
-          <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+          <div className="flex flex-wrap gap-2 border-t-2 border-line pt-4">
             {idx > 0 && (
               <Button variant="ghost" onClick={() => setCurrent(idx - 1)}>
                 Back

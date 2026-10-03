@@ -44,7 +44,7 @@ export function StartGate({
           startedThisDocument = true;
           setStarted(true);
         }}
-        className="min-h-[120px] min-w-[360px] rounded-[40px] bg-sea px-12 text-[48px] font-bold text-white shadow-md hover:bg-sea-deep"
+        className="min-h-[120px] min-w-[360px] rounded-[40px] border-4 border-sea-deep bg-sea px-12 text-[48px] font-bold text-white hover:bg-sea-deep"
       >
         {busy ? "One moment…" : "Start"}
       </button>

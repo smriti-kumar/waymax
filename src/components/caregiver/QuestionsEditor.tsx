@@ -29,7 +29,7 @@ function QuestionForm({ initial, onSave, onCancel }: { initial?: QuestionDto; on
     }
   }
   return (
-    <form onSubmit={submit} className="grid gap-3 rounded-2xl border border-line bg-cream p-4">
+    <form onSubmit={submit} className="grid gap-3 rounded-2xl border-2 border-line bg-cream p-4">
       <Field label="The question they ask">
         <Input name="question" required maxLength={120} defaultValue={initial?.question} placeholder="Where is my wife?" />
       </Field>
@@ -45,7 +45,7 @@ function QuestionForm({ initial, onSave, onCancel }: { initial?: QuestionDto; on
             Cancel
           </Button>
         )}
-        {error && <p className="font-medium text-sun-deep">{error}</p>}
+        {error && <p className="font-semibold text-sun-deep">{error}</p>}
       </div>
     </form>
   );
@@ -94,20 +94,26 @@ export function QuestionsEditor({ pid }: { pid: string }) {
                   />
                 </li>
               ) : (
-                <li key={q.id} className={"flex flex-wrap items-start gap-3 rounded-xl border border-line bg-white px-4 py-3 " + (q.isActive ? "" : "opacity-60")}>
-                  <div className="flex flex-col">
-                    <button aria-label={`Move "${q.question}" up`} disabled={i === 0} onClick={() => move(i, -1)} className="rounded px-2 text-lg text-ink-soft hover:bg-sand disabled:opacity-30">
-                      ▲
-                    </button>
-                    <button aria-label={`Move "${q.question}" down`} disabled={i === qs.length - 1} onClick={() => move(i, 1)} className="rounded px-2 text-lg text-ink-soft hover:bg-sand disabled:opacity-30">
-                      ▼
-                    </button>
+                <li
+                  key={q.id}
+                  className={"flex flex-wrap items-start gap-4 rounded-xl border-2 bg-white px-5 py-4 " + (q.isActive ? "border-line" : "border-dashed border-line bg-sand")}
+                >
+                  <div className="flex flex-col gap-2">
+                    <Button size="sm" variant="ghost" aria-label={`Move "${q.question}" up`} disabled={i === 0} onClick={() => move(i, -1)}>
+                      <span aria-hidden>▲</span> Up
+                    </Button>
+                    <Button size="sm" variant="ghost" aria-label={`Move "${q.question}" down`} disabled={i === qs.length - 1} onClick={() => move(i, 1)}>
+                      <span aria-hidden>▼</span> Down
+                    </Button>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold">{q.question}</p>
+                    <p className="text-lg font-bold">
+                      {q.question}
+                      {!q.isActive && <span className="ml-2 rounded-lg border-2 border-ink-soft px-2 text-base font-bold text-ink-soft">Hidden</span>}
+                    </p>
                     <p className="text-ink-soft">{q.answer}</p>
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="ghost" onClick={() => speak(q.answer)}>
                       Hear it
                     </Button>

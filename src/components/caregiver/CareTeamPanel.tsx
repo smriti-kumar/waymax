@@ -37,7 +37,7 @@ export function CareTeamPanel({ pid, canInvite }: { pid: string; canInvite: bool
     <div className="flex flex-col gap-4">
       <ul className="flex flex-wrap gap-2">
         {data?.caregivers.map((m) => (
-          <li key={m.id} className="rounded-full border border-line bg-white px-3 py-1.5 text-sm">
+          <li key={m.id} className="rounded-full border-2 border-line bg-white px-4 py-2">
             <span className="font-semibold">{m.name}</span>{" "}
             <span className="text-ink-soft">{m.role === "owner" ? "(owner)" : ""}</span>
           </li>

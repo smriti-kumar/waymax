@@ -7,7 +7,7 @@ import { ago, clockTime } from "@/client/format";
 import type { LocationResponse } from "@/lib/contracts/location";
 import { pickActiveFence } from "@/lib/geo";
 import { Button } from "@/components/ui/Button";
-import { Field, Input } from "@/components/ui/Field";
+import { Choices, Field, Input } from "@/components/ui/Field";
 import { Skeleton } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
 import type { MapFence, MapPoint } from "./FenceMapInner";
@@ -19,6 +19,7 @@ const FenceMap = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
 const DEFAULT_CENTER = { lat: 42.444, lng: -76.5019 }; // Ithaca, NY
 const DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+const RADII = [100, 150, 250, 500, 1000, 2000];
 
 type FenceRow = MapFence & { activeFrom: string | null; activeUntil: string | null; isActive: boolean };
 
@@ -27,10 +28,10 @@ export function StatusTile({ state, changedAt, label, lastAt }: { state: string;
   return (
     <div
       data-testid="fence-status"
-      className={"rounded-2xl px-5 py-4 " + (outside ? "bg-[#fdebd0] text-[#7a4a0c]" : state === "inside" ? "bg-[#e4efdc] text-leaf" : "bg-sand text-ink-soft")}
+      className={"rounded-2xl border-4 px-5 py-4 " + (outside ? "border-sun-deep bg-sun-wash text-sun-deep" : state === "inside" ? "border-leaf bg-leaf-wash text-leaf" : "border-line bg-sand text-ink-soft")}
     >
-      <p className="text-2xl font-bold">{outside ? `Outside ${label}` : state === "inside" ? `Inside ${label}` : "Location not known yet"}</p>
-      <p className="text-sm">
+      <p className="text-3xl font-bold">{outside ? `Outside ${label}` : state === "inside" ? `Inside ${label}` : "Location not known yet"}</p>
+      <p className="text-lg font-semibold">
         {changedAt ? `Since ${clockTime(changedAt)} · ` : ""}
         {lastAt ? `last update ${ago(lastAt)}` : "No location received yet — pair the patient's phone."}
       </p>
@@ -168,18 +169,16 @@ export function SafetyMapPanel({ pid }: { pid: string }) {
         latest={latest}
         onClick={(p) => setDraft(p)}
       />
-      <Field label={`Radius: ${radiusM} m`}>
-        <input
-          type="range"
-          min={50}
-          max={2000}
-          step={10}
-          value={radiusM}
-          onChange={(e) => setRadius(Number(e.target.value))}
-          aria-label="Radius in metres"
-          className="accent-sea"
-        />
-      </Field>
+      <Choices
+        label="How far can they go before you're alerted?"
+        name="radius"
+        value={String(radiusM)}
+        onChange={(v) => setRadius(Number(v))}
+        options={[
+          ...(RADII.includes(radiusM) ? [] : [{ value: String(radiusM), label: `${radiusM} m (current)` }]),
+          ...RADII.map((m) => ({ value: String(m), label: m < 1000 ? `${m} m` : `${m / 1000} km` })),
+        ]}
+      />
       {mode === "home" ? (
         <Button onClick={saveHome} loading={busy === "home"} disabled={!draft && radius === null && !!home}>
           {home ? "Save home area" : "Set home here"}
@@ -205,7 +204,7 @@ export function SafetyMapPanel({ pid }: { pid: string }) {
           {fences.data.fences
             .filter((f) => f.kind === "temporary")
             .map((f) => (
-              <li key={f.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line bg-white px-4 py-2">
+              <li key={f.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border-2 border-line bg-white px-4 py-3">
                 <span>
                   <span className="font-semibold">{f.label}</span>{" "}
                   <span className="text-sm text-ink-soft">
@@ -229,7 +228,7 @@ export function SafetyMapPanel({ pid }: { pid: string }) {
         </ul>
       )}
       {DEMO && (
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border-2 border-dashed border-sun bg-[#fff8ea] p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border-2 border-dashed border-sun-deep bg-sun-wash p-4">
           <span className="font-semibold text-sun-deep">Demo:</span>
           <Button size="sm" variant="warn" loading={busy === "walk_out"} disabled={!home} onClick={() => simulate("walk_out")}>
             Simulate walk out

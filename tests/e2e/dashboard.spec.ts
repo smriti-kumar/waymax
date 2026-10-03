@@ -25,7 +25,7 @@ test("a caregiver with two patients can switch between them", async ({ browser }
   const cg = await ctx.newPage();
   await cg.goto(`/caregiver/${maggie}/schedule`);
   await expect(cg.getByRole("heading", { level: 1, name: "Maggie" })).toBeVisible();
-  await cg.getByTestId("patient-switcher").selectOption(bob);
+  await cg.getByTestId("patient-switcher").getByRole("link", { name: "Bob" }).click();
   await cg.waitForURL(`**/caregiver/${bob}/schedule`);
   await expect(cg.getByRole("heading", { level: 1, name: "Bob" })).toBeVisible();
 });

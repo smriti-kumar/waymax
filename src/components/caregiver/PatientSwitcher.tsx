@@ -1,26 +1,29 @@
 "use client";
-import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cx } from "@/components/ui/cx";
 
-/** Shown when a caregiver looks after more than one patient; keeps the current section. */
+/** Shown when a caregiver looks after more than one patient: one button per patient, keeping the current section. */
 export function PatientSwitcher({ current, patients }: { current: string; patients: { id: string; preferredName: string }[] }) {
-  const router = useRouter();
   const path = usePathname();
   if (patients.length < 2) return null;
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <span className="text-ink-soft">Switch to</span>
-      <select
-        data-testid="patient-switcher"
-        value={current}
-        onChange={(e) => router.push(path.replace(`/caregiver/${current}`, `/caregiver/${e.target.value}`))}
-        className="rounded-lg border border-line bg-white px-2 py-1.5 font-semibold"
-      >
-        {patients.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.preferredName}
-          </option>
-        ))}
-      </select>
-    </label>
+    <nav aria-label="Switch patient" data-testid="patient-switcher" className="flex flex-wrap items-center gap-2">
+      <span className="font-bold text-ink-soft">Caring for:</span>
+      {patients.map((p) => (
+        <Link
+          key={p.id}
+          href={path.replace(`/caregiver/${current}`, `/caregiver/${p.id}`)}
+          aria-current={p.id === current ? "page" : undefined}
+          className={cx(
+            "inline-flex min-h-12 items-center rounded-xl border-2 px-4 text-lg font-bold",
+            p.id === current ? "border-sea-deep bg-sea text-white" : "border-line bg-white text-ink hover:bg-sand",
+          )}
+        >
+          {p.id === current && <span aria-hidden>✓&nbsp;</span>}
+          {p.preferredName}
+        </Link>
+      ))}
+    </nav>
   );
 }

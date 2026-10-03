@@ -8,7 +8,7 @@ export function PersonCard({ card, onClose }: { card: PersonCardDto; onClose: ()
       aria-live="polite"
       aria-label={`${card.name}, your ${card.relationship}`}
       data-testid="person-card"
-      className="wm-slide-up absolute inset-x-8 top-6 bottom-6 z-10 flex items-center gap-12 rounded-[40px] border-4 border-sea bg-cream px-12 py-8 shadow-xl"
+      className="wm-slide-up absolute inset-x-8 top-6 bottom-6 z-10 flex items-center gap-12 rounded-[40px] border-[6px] border-sea bg-cream px-12 py-8 shadow-xl"
     >
       <button
         onClick={onClose}
@@ -20,7 +20,7 @@ export function PersonCard({ card, onClose }: { card: PersonCardDto; onClose: ()
       </button>
       {card.photoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={card.photoUrl} alt="" className="h-[min(52vh,440px)] w-[min(52vh,440px)] flex-none rounded-[48px] object-cover shadow-md" />
+        <img src={card.photoUrl} alt="" className="h-[min(52vh,440px)] w-[min(52vh,440px)] flex-none rounded-[48px] border-4 border-line object-cover" />
       ) : (
         <div className="flex h-[min(52vh,440px)] w-[min(52vh,440px)] flex-none items-center justify-center rounded-[48px] bg-sand text-[160px] font-bold text-sea-deep">
           {card.name[0]}
@@ -31,7 +31,7 @@ export function PersonCard({ card, onClose }: { card: PersonCardDto; onClose: ()
           {card.name}
         </h1>
         <p className="text-[48px] font-semibold text-sea-deep">Your {card.relationship}</p>
-        <p className="max-w-[28ch] text-[36px] leading-snug text-ink-soft" data-testid="person-card-recap">
+        <p className="max-w-[28ch] text-[36px] leading-normal text-ink" data-testid="person-card-recap">
           {card.recap.replace(new RegExp(`^${card.name}, your ${card.relationship}\\.\\s*`, "i"), "")}
         </p>
       </div>

@@ -69,7 +69,7 @@ export function ConversationsList({ pid }: { pid: string }) {
         <ul className="flex flex-col gap-2" data-testid="conversations">
           {data.conversations.map((c) => (
             <li key={c.id}>
-              <button onClick={() => setOpen(c)} className="flex w-full flex-col gap-1 rounded-xl border border-line bg-white px-4 py-3 text-left hover:border-sea">
+              <button onClick={() => setOpen(c)} className="flex w-full flex-col gap-1 rounded-xl border-2 border-line bg-white px-4 py-3 text-left hover:border-sea">
                 <span className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-semibold">{c.personName ?? "Someone"}</span>
                   <span className="text-sm text-ink-soft">{new Date(c.startedAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</span>

@@ -67,7 +67,7 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
       {contacts.length === 0 ? (
         <EmptyState title="No alert numbers yet" body="Add at least one iPhone number below." />
       ) : (
-        <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+        <ul className="divide-y divide-line rounded-2xl border-2 border-line bg-white">
           {contacts.map((c) => (
             <li key={c.id} className="flex items-center justify-between gap-3 px-4 py-3">
               <span>
@@ -107,7 +107,7 @@ export function AlertContactsPanel({ pid }: { pid: string }) {
         </Button>
       </div>
       {msg && (
-        <div role="status" className={"rounded-xl px-4 py-3 " + (msg.tone === "ok" ? "bg-[#e4efdc] text-leaf" : "bg-[#fff6e6] text-sun-deep")}>
+        <div role="status" className={"rounded-xl px-4 py-3 " + (msg.tone === "ok" ? "bg-leaf-wash text-leaf" : "bg-sun-wash text-sun-deep")}>
           <p className="font-semibold">{msg.text}</p>
           {msg.results && (
             <ul className="mt-1 text-sm">

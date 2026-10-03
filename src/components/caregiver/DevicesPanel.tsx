@@ -44,7 +44,7 @@ export function DevicesPanel({ pid }: { pid: string }) {
       ) : active.length === 0 ? (
         <EmptyState title="No devices paired yet" body="Make a code above and type it on the patient's laptop or phone." />
       ) : (
-        <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+        <ul className="divide-y divide-line rounded-2xl border-2 border-line bg-white">
           {active.map((d) => (
             <li key={d.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
               <div>

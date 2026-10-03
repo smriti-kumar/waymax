@@ -3,8 +3,8 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { api, ApiClientError } from "@/client/api";
 import { Button } from "@/components/ui/Button";
-import { Field, Input, Select } from "@/components/ui/Field";
-import { TIMEZONES } from "@/lib/timezones";
+import { Choices, Field, Input } from "@/components/ui/Field";
+import { TIMEZONES, timezoneChoices } from "@/lib/timezones";
 
 export function CreatePatientForm({ onDone }: { onDone?: (id: string) => void }) {
   const router = useRouter();
@@ -38,22 +38,20 @@ export function CreatePatientForm({ onDone }: { onDone?: (id: string) => void })
       <Field label="What they like to be called">
         <Input name="preferredName" required maxLength={60} placeholder="Maggie" />
       </Field>
-      <Field label="Time zone">
-        <Select name="timezone" defaultValue={TIMEZONES.includes(guess) ? guess : "America/New_York"}>
-          {TIMEZONES.map((tz) => (
-            <option key={tz} value={tz}>
-              {tz.replace(/_/g, " ")}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <div className="flex items-end">
-        <Button type="submit" loading={busy} className="w-full">
+      <Choices
+        className="sm:col-span-2"
+        label="Time zone"
+        name="timezone"
+        options={timezoneChoices(TIMEZONES)}
+        defaultValue={TIMEZONES.includes(guess) ? guess : "America/New_York"}
+      />
+      <div className="sm:col-span-2">
+        <Button type="submit" size="lg" loading={busy} className="w-full sm:w-auto">
           Add patient
         </Button>
       </div>
       {error && (
-        <p role="alert" className="font-medium text-sun-deep sm:col-span-2">
+        <p role="alert" className="font-semibold text-sun-deep sm:col-span-2">
           {error}
         </p>
       )}
