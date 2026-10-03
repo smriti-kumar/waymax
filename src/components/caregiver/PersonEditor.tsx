@@ -16,6 +16,7 @@ import { PersonForm } from "./PersonForm";
 import { PhotoUploader } from "./PhotoUploader";
 import { usePhotoEnrollment } from "./usePhotoEnrollment";
 import { PreviewVoiceButton } from "./PreviewVoiceButton";
+import { DatesEditor } from "./DatesEditor";
 
 export function PersonEditor({ pid, personId }: { pid: string; personId: string }) {
   const router = useRouter();
@@ -27,7 +28,7 @@ export function PersonEditor({ pid, personId }: { pid: string; personId: string 
 
   if (isLoading) return <Skeleton className="h-64" />;
   if (error || !data) return <ErrorState message="We couldn't load this person." onRetry={() => mutate()} />;
-  const { person, photos, memories } = data;
+  const { person, photos, memories, dates } = data;
 
   return (
     <>
@@ -100,6 +101,11 @@ export function PersonEditor({ pid, personId }: { pid: string; personId: string 
             mutate();
           }}
         />
+      </Card>
+
+      <Card>
+        <CardTitle className="mb-4">Important dates</CardTitle>
+        <DatesEditor personId={personId} dates={dates} onChange={() => mutate()} />
       </Card>
 
       <Card>

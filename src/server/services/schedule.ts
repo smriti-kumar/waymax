@@ -19,6 +19,7 @@ import {
 import { pickActiveFence } from "@/lib/geo";
 import { mediaUrl } from "@/server/storage";
 import { getPatient } from "./patients";
+import { upcomingDates } from "./dates";
 
 type Row = typeof scheduleItems.$inferSelect;
 
@@ -202,6 +203,7 @@ export async function buildToday(patientId: string, now = new Date()): Promise<T
     })),
     nextText: nextLine(items, tz),
     emptyText: items.length ? null : EMPTY_DAY_TEXT,
+    specialToday: (await upcomingDates(patientId, localDate(now, tz), 0)).map((d) => `It's ${d.text} today.`),
   };
 }
 

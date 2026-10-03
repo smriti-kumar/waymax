@@ -7,6 +7,7 @@ import { dayBounds, localDate } from "@/lib/schedule";
 import { mediaUrl } from "@/server/storage";
 import { friendlyDeliveryError } from "@/lib/delivery";
 import { getPatient, lastLocation } from "./patients";
+import { upcomingDates } from "./dates";
 
 /** Continuous-aggregate bucket timezone (fixed for the demo, PLAN §4). */
 export const AGG_TZ = "America/New_York";
@@ -160,6 +161,7 @@ export async function buildDashboard(pid: string, now = new Date()) {
       minutes: Math.max(1, Math.round((v.lastSeenAt.getTime() - v.startedAt.getTime()) / 60000)),
     })),
     confusionToday: Number(confusedToday[0]?.n ?? 0),
+    upcomingDates: await upcomingDates(pid, localDate(now, tz), 30),
     devices: devs.map((d) => ({
       id: d.id,
       kind: d.kind,

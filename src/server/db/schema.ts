@@ -285,6 +285,31 @@ export const personMemories = pgTable(
   (t) => [index().on(t.personId)],
 );
 
+export const dateKind = pgEnum("date_kind", ["birthday", "anniversary", "other"]);
+
+/** Birthdays, anniversaries and other yearly dates for a person (month/day; year optional). */
+export const personDates = pgTable(
+  "person_dates",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    personId: uuid("person_id")
+      .notNull()
+      .references(() => people.id, { onDelete: "cascade" }),
+    kind: dateKind("kind").notNull(),
+    label: text("label"),
+    month: smallint("month").notNull(),
+    day: smallint("day").notNull(),
+    year: smallint("year"),
+    createdAt: ts("created_at").notNull().defaultNow(),
+  },
+  (t) => [
+    check("person_dates_month_check", sql`${t.month} between 1 and 12`),
+    check("person_dates_day_check", sql`${t.day} between 1 and 31`),
+    check("person_dates_year_check", sql`${t.year} is null or ${t.year} between 1900 and 2100`),
+    index().on(t.personId),
+  ],
+);
+
 export const visits = pgTable(
   "visits",
   {

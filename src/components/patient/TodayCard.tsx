@@ -58,6 +58,12 @@ export function TodayCard({ today, timezone, preferredName }: { today: TodayResp
         </div>
       </header>
 
+      {!!today?.specialToday?.length && (
+        <p className="flex-none rounded-3xl bg-[#fdf0d8] px-8 py-[1.2vh] text-[clamp(28px,4.2vh,36px)] font-bold text-ink" data-testid="today-special">
+          {today.specialToday.join(" ")}
+        </p>
+      )}
+
       {today?.nextText && (
         <p className="flex-none rounded-3xl bg-sea px-8 py-[1.6vh] text-[clamp(30px,4.8vh,40px)] font-bold text-white" data-testid="today-next">
           {today.nextText}

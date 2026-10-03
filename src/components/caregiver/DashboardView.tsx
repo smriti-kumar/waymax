@@ -23,6 +23,7 @@ type Dashboard = {
   confusionToday: number;
   devices: { id: string; kind: string; label: string; lastSeenAt: string | null; online: boolean }[];
   flags: { id: string; kind: string; message: string }[];
+  upcomingDates: { id: string; days: number; dateText: string; text: string }[];
 };
 type Confusion = { daily: { day: string; n: number }[]; byHour: { hour: number; n: number }[]; insight?: string | null };
 
@@ -155,6 +156,23 @@ export function DashboardView({ pid }: { pid: string }) {
       </Card>
 
       <div className="flex flex-col gap-4">
+        <Card>
+          <CardTitle className="mb-2">Coming up</CardTitle>
+          {d.upcomingDates.length === 0 ? (
+            <p className="text-ink-soft">No birthdays or anniversaries in the next 30 days. Add them on each person&apos;s page.</p>
+          ) : (
+            <ul className="flex flex-col gap-1" data-testid="upcoming-dates">
+              {d.upcomingDates.map((u) => (
+                <li key={u.id} className="flex justify-between gap-3">
+                  <span>{u.text}</span>
+                  <span className={u.days === 0 ? "font-semibold text-leaf" : "text-ink-soft"}>
+                    {u.days === 0 ? "today" : u.days === 1 ? "tomorrow" : `${u.dateText} · in ${u.days} days`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
         <Card>
           <CardTitle className="mb-2">Waiting for approval</CardTitle>
           {d.pendingPeople > 0 ? (

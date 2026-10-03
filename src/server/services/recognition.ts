@@ -9,6 +9,7 @@ import { buildRecap, buildSayText } from "@/lib/text";
 import { localDate } from "@/lib/schedule";
 import type { PersonCardDto } from "@/lib/contracts/patient";
 import { getPatient } from "./patients";
+import { upcomingDates } from "./dates";
 
 export const VISIT_GAP_MS = 5 * 60 * 1000;
 
@@ -71,12 +72,13 @@ export async function personCard(patientId: string, personId: string, currentVis
     lastFact,
   });
 
+  const special = (await upcomingDates(patientId, localDate(now, tz), 0)).filter((d) => d.personId === p.id);
   return {
     personId: p.id,
     name: p.name!,
     relationship: p.relationship!,
     photoUrl: mediaUrl(p.primaryPhotoId),
-    recap,
+    recap: special.length ? `${recap} It's ${special[0]!.text} today!` : recap,
     sayText: buildSayText(p.name!, p.spokenName, p.relationship),
     visitId: currentVisitId,
   };
