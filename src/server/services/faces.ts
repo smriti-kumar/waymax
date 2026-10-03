@@ -4,6 +4,7 @@ import { db } from "@/server/db/client";
 import { faceEmbeddings, people } from "@/server/db/schema";
 import { unprocessable } from "@/server/http/errors";
 import { assertMediaOfPatient, type PersonRow } from "./people";
+import { mediaUrl } from "@/server/storage";
 
 export type EmbeddingItem = { vector: number[]; dim: number; model: string; mediaId?: string | null };
 
@@ -89,4 +90,13 @@ export async function moveEmbeddings(fromId: string, toId: string) {
     .update(faceEmbeddings)
     .set({ personId: toId })
     .where(and(eq(faceEmbeddings.personId, fromId), ne(faceEmbeddings.personId, toId)));
+}
+
+export async function approvedPeople(patientId: string) {
+  const rows = await db()
+    .select({ id: people.id, name: people.name, relationship: people.relationship, photo: people.primaryPhotoId })
+    .from(people)
+    .where(and(eq(people.patientId, patientId), eq(people.status, "approved")))
+    .orderBy(people.name);
+  return rows.map((r) => ({ personId: r.id, name: r.name!, relationship: r.relationship!, photoUrl: mediaUrl(r.photo) }));
 }

@@ -29,6 +29,11 @@ export class FaceMatcher {
     }
   }
 
+  /** Swap in the engine's native matcher once it has loaded. */
+  setFind(find: FindFn) {
+    this.find = find;
+  }
+
   get size() {
     return this.descriptors.length;
   }

@@ -31,3 +31,32 @@ export async function makeDevice(patientId: string, caregiverId: string, kind: "
   const paired = await pairDevice(code, kind === "patient_display" ? "Laptop" : "Phone");
   return { ...paired, cookie: `wm_device=${paired.token}`, auth: { authorization: `Device ${paired.token}` } };
 }
+
+import { people as peopleTable, faceEmbeddings as embTable } from "@/server/db/schema";
+import { seededVector } from "@/client/face/mock-engine";
+
+/** Approved person with `samples` seeded embeddings (seed = name). */
+export async function makePerson(
+  patientId: string,
+  values: Partial<typeof peopleTable.$inferInsert> = {},
+  samples = 3,
+) {
+  const [p] = await db()
+    .insert(peopleTable)
+    .values({ patientId, name: "Priya", relationship: "daughter", status: "approved", createdVia: "seed", ...values })
+    .returning();
+  if (samples > 0) {
+    await db()
+      .insert(embTable)
+      .values(
+        Array.from({ length: samples }, (_, i) => ({
+          personId: p.id,
+          model: "human-faceres",
+          dim: 1024,
+          embedding: seededVector(i === 0 ? (p.name ?? p.id) : `${p.name}-${i}`),
+          source: "upload" as const,
+        })),
+      );
+  }
+  return p;
+}
