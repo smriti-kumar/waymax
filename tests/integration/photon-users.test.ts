@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { http, HttpResponse } from "msw";
 import { setupFetchServer } from "../support/msw";
 import { resetEnvCache } from "@/server/env";
-import { registerPhotonUser } from "@/server/notify/photon-users";
+import { ensurePhotonUser, photonOptInUrl, registerPhotonUser } from "@/server/notify/photon-users";
 import { RegisteringSender, type MessageSender } from "@/server/notify";
 
 const server = setupFetchServer();
@@ -37,6 +37,7 @@ describe("Photon auto-registration", () => {
     expect(await registerPhotonUser("+16075550101", "Raj Lee")).toBe("registered");
     expect(auth).toBe("Bearer dash-token");
     expect(posted).toMatchObject({ firstName: "Raj", lastName: "Lee", phoneNumber: "+16075550101", sendInvite: false });
+    expect(posted.email).toBe("alerts+16075550101@example.com");
   });
 
   it("skips numbers that are already registered and never throws", async () => {
@@ -44,6 +45,19 @@ describe("Photon auto-registration", () => {
     expect(await registerPhotonUser("+16075550101", "Raj")).toBe("already");
     server.use(http.get(URL_, () => HttpResponse.error()), http.post(URL_, () => HttpResponse.json({ error: "nope" }, { status: 401 })));
     expect(await registerPhotonUser("+16075550199", "X")).toBe("failed");
+  });
+
+  it("returns the Photon user id for new and existing numbers", async () => {
+    server.use(
+      http.get(URL_, () => HttpResponse.json({ users: [{ id: "old", phoneNumber: "+1 (607) 555-0101" }] })),
+      http.post(URL_, () => HttpResponse.json({ success: true, user: { id: "new" } })),
+    );
+    expect(await ensurePhotonUser("+16075550101", "Raj")).toEqual({ status: "already", userId: "old" });
+    expect(await ensurePhotonUser("+16075550102", "Ana")).toEqual({ status: "registered", userId: "new" });
+  });
+
+  it("builds the Photon-hosted opt-in redirect link", () => {
+    expect(photonOptInUrl("u 1", "Hi there!")).toBe("https://spectrum.photon.codes/users/u%201/redirect?msg=Hi%20there!");
   });
 
   it("RegisteringSender registers 'not allowed' numbers and retries them once", async () => {

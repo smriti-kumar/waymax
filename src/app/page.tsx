@@ -12,13 +12,13 @@ export default function Home() {
       <div className="grid w-full gap-4 sm:grid-cols-2">
         <Link
           href="/login"
-          className="rounded-3xl border-4 border-sea-deep bg-sea px-6 py-8 text-3xl font-bold text-white transition hover:bg-sea-deep"
+          className="flex items-center justify-center rounded-3xl border-4 border-sea-deep bg-sea px-6 py-8 text-3xl font-bold text-white transition hover:bg-sea-deep"
         >
           I&apos;m a caregiver
         </Link>
         <Link
           href="/pair"
-          className="rounded-3xl border-4 border-sea bg-white px-6 py-8 text-3xl font-bold text-sea-deep transition hover:bg-sky"
+          className="flex items-center justify-center rounded-3xl border-4 border-sea bg-white px-6 py-8 text-3xl font-bold text-sea-deep transition hover:bg-sky"
         >
           Set up this device
         </Link>

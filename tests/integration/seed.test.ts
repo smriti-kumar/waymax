@@ -20,7 +20,7 @@ describeDb("demo seed", () => {
     const today = await buildToday(link.patientId);
     expect(today.preferredName).toBe("Maggie");
     expect(today.items.length).toBeGreaterThanOrEqual(5);
-    expect(today.visitorsToday.map((v) => v.name)).toContain("Priya");
+    expect(today.visitorsToday.map((v) => v.name)).toContain("Jiya");
     const chart = await confusionStats(link.patientId, 14);
     expect(chart.daily.filter((d) => d.n > 0).length).toBeGreaterThanOrEqual(12);
     const phrases = await prewarmPhrases(link.patientId);

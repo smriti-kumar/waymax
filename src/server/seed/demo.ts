@@ -24,66 +24,67 @@ import { placeholderPhoto, placeholderScene } from "./images";
 
 export const DEMO_EMAIL = "demo@waymax.app";
 export const DEMO_PASSWORD = "waymax-demo";
-/** Central Ithaca, NY (Ithaca Commons). */
-export const DEMO_HOME = { lat: 42.4396, lng: -76.4969, radiusM: 150 };
+export const DEMO_CAREGIVER_NAME = "BigRed Hacks";
+/** Physical Sciences Building, Cornell University, Ithaca, NY. */
+export const DEMO_HOME = { lat: 42.44987, lng: -76.48179, radiusM: 150 };
 const TZ = "America/New_York";
 
 const PEOPLE = [
   {
-    key: "priya",
-    name: "Priya",
+    key: "jiya",
+    name: "Jiya",
     relationship: "daughter",
-    spokenName: "PREE-yah",
+    spokenName: "JEE-yah",
     description: "Your daughter. She's a teacher and lives across town with her husband Dev.",
     visitRoutine: "Comes for lunch most days",
     color: "#2f6f73",
     memories: [
-      { title: "Priya's graduation", body: "You cried happy tears when she walked across the stage.", occurredOn: "2012-05-26", scene: "#7fb3a7" },
-      { title: "Beach day at Cape May", body: "Priya built a sandcastle with a moat, and you found a perfect shell.", occurredOn: "1994-07-10", scene: "#e9c46a" },
-      { title: "Max the puppy", body: "Priya's new golden retriever puppy. He loves your garden.", occurredOn: null, scene: "#d4a373" },
+      { title: "Jiya's graduation", body: "You cried happy tears when she walked across the stage.", occurredOn: "2012-05-26", scene: "#7fb3a7" },
+      { title: "Beach day at Cape May", body: "Jiya built a sandcastle with a moat, and you found a perfect shell.", occurredOn: "1994-07-10", scene: "#e9c46a" },
+      { title: "Max the puppy", body: "Jiya's new golden retriever puppy. He loves your garden.", occurredOn: null, scene: "#d4a373" },
     ],
   },
   {
-    key: "raj",
-    name: "Raj",
-    relationship: "son",
+    key: "smriti",
+    name: "Smriti",
+    relationship: "daughter",
     spokenName: null,
-    description: "Your son. He works as an engineer in Rochester and calls every evening.",
+    description: "Your daughter. She works as an engineer in Rochester and calls every evening.",
     visitRoutine: "Visits Wednesdays for tea and calls every evening at 7",
     color: "#b8731a",
     memories: [
-      { title: "Fishing on Cayuga Lake", body: "Raj caught his first fish and wanted to name it.", occurredOn: "1990-08-18", scene: "#6a9fb5" },
-      { title: "Raj's wedding", body: "You danced with Raj to your favourite song.", occurredOn: "2015-09-12", scene: "#c9a0dc" },
+      { title: "Fishing on Cayuga Lake", body: "Smriti caught her first fish and wanted to name it.", occurredOn: "1990-08-18", scene: "#6a9fb5" },
+      { title: "Smriti's wedding", body: "You danced with Smriti to your favourite song.", occurredOn: "2015-09-12", scene: "#c9a0dc" },
     ],
   },
   {
-    key: "sam",
-    name: "Sam",
+    key: "trishia",
+    name: "Trishia",
     relationship: "neighbor",
     spokenName: null,
-    description: "Your neighbour from next door. He helps with the garden.",
+    description: "Your neighbour from next door. She helps with the garden.",
     visitRoutine: "Pops by on Saturday mornings",
     color: "#4f7a3a",
-    memories: [{ title: "The tomato harvest", body: "Sam and you grew the biggest tomatoes on the street.", occurredOn: "2023-08-30", scene: "#e76f51" }],
+    memories: [{ title: "The tomato harvest", body: "Trishia and you grew the biggest tomatoes on the street.", occurredOn: "2023-08-30", scene: "#e76f51" }],
   },
   {
-    key: "nora",
-    name: "Nora",
+    key: "urja",
+    name: "Urja",
     relationship: "home helper",
     spokenName: null,
-    description: "Nora helps at home on weekday mornings.",
+    description: "Urja helps at home on weekday mornings.",
     visitRoutine: "Weekday mornings from 9 to 12",
     color: "#6d597a",
-    memories: [{ title: "Baking banana bread", body: "Nora and you baked banana bread with walnuts.", occurredOn: "2025-11-02", scene: "#f4a261" }],
+    memories: [{ title: "Baking banana bread", body: "Urja and you baked banana bread with walnuts.", occurredOn: "2025-11-02", scene: "#f4a261" }],
   },
 ] as const;
 
 const QUESTIONS = [
-  ["Where is Priya?", "Priya is at school, teaching. She'll come for lunch at 12:30."],
-  ["When is Raj coming?", "Raj calls you every evening at 7 o'clock, and he visits on Wednesday for tea."],
+  ["Where is Jiya?", "Jiya is at school, teaching. She'll come for lunch at 12:30."],
+  ["When is Smriti coming?", "Smriti calls you every evening at 7 o'clock, and she visits on Wednesday for tea."],
   ["What day is it today?", "Look at the big clock on this screen. It shows the day and the time."],
   ["Where am I?", "You are at home, in your own house in Ithaca. You're safe."],
-  ["Have I eaten lunch?", "Lunch is at 12:30 with Priya. If it's later than that, you've had it. If you're hungry, Nora left fruit in the kitchen."],
+  ["Have I eaten lunch?", "Lunch is at 12:30 with Jiya. If it's later than that, you've had it. If you're hungry, Urja left fruit in the kitchen."],
   ["Where are my glasses?", "Your glasses are usually on the table next to your armchair."],
 ] as const;
 
@@ -123,7 +124,7 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
 
   const [cg] = await db()
     .insert(caregivers)
-    .values({ email: DEMO_EMAIL, passwordHash: await hashPassword(DEMO_PASSWORD), name: "Alex Demo", phoneE164: env().DEMO_ALERT_PHONE ?? null })
+    .values({ email: DEMO_EMAIL, passwordHash: await hashPassword(DEMO_PASSWORD), name: DEMO_CAREGIVER_NAME, phoneE164: env().DEMO_ALERT_PHONE ?? null })
     .returning();
   const [p] = await db()
     .insert(patients)
@@ -169,9 +170,9 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
 
   // Important dates.
   await db().insert(personDates).values([
-    { personId: ids.priya!, kind: "birthday", month: 5, day: 14, year: 1988 },
-    { personId: ids.raj!, kind: "birthday", month: 11, day: 2, year: 1985 },
-    { personId: ids.raj!, kind: "anniversary", label: "Raj and Anita's wedding anniversary", month: 9, day: 12, year: 2015 },
+    { personId: ids.jiya!, kind: "birthday", month: 5, day: 14, year: 1988 },
+    { personId: ids.smriti!, kind: "birthday", month: 11, day: 2, year: 1985 },
+    { personId: ids.smriti!, kind: "anniversary", label: "Smriti and Anita's wedding anniversary", month: 9, day: 12, year: 2015 },
   ]);
 
   // Weekly schedule.
@@ -186,14 +187,14 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
   });
   await db().insert(scheduleItems).values([
     weekly("Breakfast", "meal", EVERY_DAY, "08:00", 30),
-    weekly("Nora is here", "visit", [1, 2, 3, 4, 5], "09:00", 180, ids.nora),
+    weekly("Urja is here", "visit", [1, 2, 3, 4, 5], "09:00", 180, ids.urja),
     weekly("Morning walk", "activity", [1, 3, 5], "10:30", 45),
-    weekly("Lunch", "visit", EVERY_DAY, "12:30", 60, ids.priya),
+    weekly("Lunch", "visit", EVERY_DAY, "12:30", 60, ids.jiya),
     weekly("Physio exercises", "therapy", [2, 4], "15:00", 45),
-    weekly("Tea", "visit", [3], "16:00", 60, ids.raj),
-    weekly("Garden time", "activity", [6], "10:00", 60, ids.sam),
+    weekly("Tea", "visit", [3], "16:00", 60, ids.smriti),
+    weekly("Garden time", "activity", [6], "10:00", 60, ids.trishia),
     weekly("Dinner", "meal", EVERY_DAY, "18:00", 45),
-    weekly("Phone call", "other", EVERY_DAY, "19:00", 20, ids.raj),
+    weekly("Phone call", "other", EVERY_DAY, "19:00", 20, ids.smriti),
   ]);
 
   await db()
@@ -202,10 +203,10 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
 
   // A little history so recaps say "Last visit: …" and carry a fact.
   const pastVisits = [
-    { key: "priya", daysAgo: 1, hh: 12, mm: 35, mins: 55 },
-    { key: "priya", daysAgo: 3, hh: 12, mm: 40, mins: 50 },
-    { key: "raj", daysAgo: 5, hh: 16, mm: 5, mins: 70 },
-    { key: "sam", daysAgo: 2, hh: 10, mm: 10, mins: 25 },
+    { key: "jiya", daysAgo: 1, hh: 12, mm: 35, mins: 55 },
+    { key: "jiya", daysAgo: 3, hh: 12, mm: 40, mins: 50 },
+    { key: "smriti", daysAgo: 5, hh: 16, mm: 5, mins: 70 },
+    { key: "trishia", daysAgo: 2, hh: 10, mm: 10, mins: 25 },
   ];
   for (const v of pastVisits) {
     const start = localAt(v.daysAgo, v.hh, v.mm, now);
@@ -214,16 +215,16 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
       .insert(visits)
       .values({ patientId: p.id, personId: ids[v.key]!, startedAt: start, lastSeenAt: end, endedAt: end })
       .returning();
-    if (v.key === "priya" && v.daysAgo === 1) {
+    if (v.key === "jiya" && v.daysAgo === 1) {
       await db().insert(conversations).values({
         patientId: p.id,
         visitId: visit.id,
-        personId: ids.priya,
+        personId: ids.jiya,
         status: "done",
-        transcript: "A: Hi Mom, it's Priya.\nB: Oh, hello dear.\nA: Max chewed my shoe again! He's getting so big.\nB: That puppy!\nA: We're going to the farmers market on Saturday.",
-        summary: "You had lunch with Priya. She told you her puppy Max chewed her shoe, and she's going to the farmers market on Saturday.",
-        keyFacts: ["Priya's puppy Max chewed her shoe", "Priya is going to the farmers market on Saturday"],
-        speakerClaim: { claimedName: "Priya", matchesFace: true, matchedPersonId: ids.priya, faceName: "Priya" },
+        transcript: "A: Hi Mom, it's Jiya.\nB: Oh, hello dear.\nA: Max chewed my shoe again! He's getting so big.\nB: That puppy!\nA: We're going to the farmers market on Saturday.",
+        summary: "You had lunch with Jiya. She told you her puppy Max chewed her shoe, and she's going to the farmers market on Saturday.",
+        keyFacts: ["Jiya's puppy Max chewed her shoe", "Jiya is going to the farmers market on Saturday"],
+        speakerClaim: { claimedName: "Jiya", matchesFace: true, matchedPersonId: ids.jiya, faceName: "Jiya" },
         startedAt: start,
         endedAt: end,
       });
@@ -253,7 +254,7 @@ export async function seedDemo({ force = false, now = new Date() } = {}): Promis
 
   return [
     `Seeded demo account ${DEMO_EMAIL} / ${DEMO_PASSWORD}`,
-    `Patient: Margaret Lee ("Maggie"), home fence ${DEMO_HOME.radiusM} m at Ithaca Commons`,
+    `Patient: Margaret Lee ("Maggie"), home fence ${DEMO_HOME.radiusM} m at the Physical Sciences Building, Cornell`,
     `People: ${PEOPLE.map((x) => `${x.name} (${x.relationship})`).join(", ")} — add real face photos on each person's page`,
     `${QUESTIONS.length} questions, weekly schedule, ${pastVisits.length} past visits, ${events.filter((e) => e.kind === "confused_pressed").length} confusion presses over 14 days`,
     demoPhone ? `Alert contact: ${demoPhone}` : "No DEMO_ALERT_PHONE set: no alert contact created",

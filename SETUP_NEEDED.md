@@ -35,7 +35,7 @@ Paste every value into **`.env.local`** in the repo root (it's already there, gi
 - **Why:** when Maggie leaves home, each alert iPhone gets an iMessage. (Without it, alerts are in-app only.)
 - **Click path:** <https://app.photon.codes> → sign up → **Create project** → enable **Spectrum** / iMessage → wait until an **iMessage line is assigned** (shown on the project) → **Settings** → copy **Project ID** and **Project Secret**.
 - **Paste as:** `SPECTRUM_PROJECT_ID=…` and `SPECTRUM_PROJECT_SECRET=…` (leave `SPECTRUM_WEBHOOK_SECRET` empty)
-- **One-time step on every alert iPhone:** text **"hi"** from that iPhone to the assigned Photon line, so iMessage lets the line reply.
+- **One-time step on every alert iPhone:** after adding the number under **Safety → Alert contacts**, scan the QR code shown with that iPhone and tap **Send** in Messages. (Needs `PHOTON_DASHBOARD_TOKEN` so Waymax can create the Photon user.)
 - **Cost:** free shared line pool. If it asks for billing, use promo code **HACKWITHPHOTON**.
 
 ## 5. Optional: demo alert phone (`DEMO_ALERT_PHONE`)
