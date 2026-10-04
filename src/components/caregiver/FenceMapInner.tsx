@@ -37,7 +37,7 @@ export default function FenceMapInner({
   recenterKey?: string;
 }) {
   return (
-    <MapContainer center={[center.lat, center.lng]} zoom={16} scrollWheelZoom className="h-[420px] w-full rounded-2xl" aria-label="Map">
+    <MapContainer center={[center.lat, center.lng]} zoom={16} scrollWheelZoom className="isolate h-[420px] w-full rounded-2xl" aria-label="Map">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
